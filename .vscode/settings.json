@@ -1,0 +1,8 @@
+{
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"[dart]": {
+		"editor.insertSpaces": false
+	},
+	"editor.wordWrapColumn": 100
+}
