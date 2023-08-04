@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'second_page.dart';
+import 'note_icon.dart';
 
 const Color COLOR_TEXT = Color(0xff000000);
 //const Color COLOR_MENU_TEXT = Color(0xff2E272D);
@@ -53,36 +54,17 @@ class FirstPage extends StatelessWidget {
 					mainAxisSpacing: 10,
 					crossAxisCount: 2,
 					children: <Widget>[
-						GestureDetector(
-							onTap: () {
-								Navigator.of(context).push(
-									MaterialPageRoute(
-										builder: (context) => SecondPage("Title from 0")
-									),
-								);
-							},
-							child: Container(
-								padding: const EdgeInsets.all(8),
-								decoration: BoxDecoration(
-									color: const Color(0xff7c94b6),
-									border: Border.all(
-										width: 4,
-									),
-									borderRadius: BorderRadius.circular(12),
-								),
-								child: Column(
-									children: [
-										Text("Title", style: TextStyle(fontWeight: FontWeight.bold)),
-										const Text("He'd have you all unravel at the, Lorem Ipsum,, Lorem Ipsum,, Lorem Ipsum,   "),
-									],
-								),
-							),
+						NoteIcon(
+							title: "Argument Test",
+							preview: "Here dead lie we, because we did not choose, to live and...",
 						),
-
-						Container(
-							padding: const EdgeInsets.all(8),
-							color: Colors.teal[200],
-							child: const Text('Heed not the rabble'),
+						NoteIcon(
+							title: "Second Test",
+								preview: "shame the land from which we sprung.",
+						),
+						NoteIcon(
+							title: "Third Test",
+							preview: "Life, to be sure, is nothing much to lose;",
 						),
 					],
 				),
