@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'second_page.dart';
 
-const Color COLOR_TEXT = Colors.black;
+const Color COLOR_TEXT = Color(0xff000000);
 //const Color COLOR_MENU_TEXT = Color(0xff2E272D);
 const Color COLOR_BACKGROUND = Color(0xffEDF6F9);
-const Color COLOR_MENU = Color(0xffFFDDD2);
+
+const Color COLOR_MENU_BG = Color(0xffFFDDD2);
+const Color COLOR_MENU_HOT = Color(0xff4FC5B9);
+const Color COLOR_MENU_COLD = Color.fromARGB(255, 2, 81, 88);
 
 void main() {
 	runApp(MyApp());
@@ -37,7 +40,7 @@ class FirstPage extends StatelessWidget {
 			appBar: AppBar(
 				title: const Text("Panels"),
 				foregroundColor: COLOR_TEXT,
-				backgroundColor: COLOR_MENU,
+				backgroundColor: COLOR_MENU_BG,
 			),
 			body: Container(
 				height: double.infinity,	
@@ -50,22 +53,32 @@ class FirstPage extends StatelessWidget {
 					mainAxisSpacing: 10,
 					crossAxisCount: 2,
 					children: <Widget>[
-						Container(
-							padding: const EdgeInsets.all(8),
-							decoration: BoxDecoration(
-								color: const Color(0xff7c94b6),
-								border: Border.all(
-									width: 8,
+						GestureDetector(
+							onTap: () {
+								Navigator.of(context).push(
+									MaterialPageRoute(
+										builder: (context) => SecondPage("Title from 0")
+									),
+								);
+							},
+							child: Container(
+								padding: const EdgeInsets.all(8),
+								decoration: BoxDecoration(
+									color: const Color(0xff7c94b6),
+									border: Border.all(
+										width: 4,
+									),
+									borderRadius: BorderRadius.circular(12),
 								),
-								borderRadius: BorderRadius.circular(12),
-							),
-							child: Column(
-								children: [
-									Text("Title", style: TextStyle(fontWeight: FontWeight.bold)),
-									const Text("He'd have you all unravel at the, Lorem Ipsum,, Lorem Ipsum,, Lorem Ipsum,   "),
-								],
+								child: Column(
+									children: [
+										Text("Title", style: TextStyle(fontWeight: FontWeight.bold)),
+										const Text("He'd have you all unravel at the, Lorem Ipsum,, Lorem Ipsum,, Lorem Ipsum,   "),
+									],
+								),
 							),
 						),
+
 						Container(
 							padding: const EdgeInsets.all(8),
 							color: Colors.teal[200],
@@ -73,21 +86,9 @@ class FirstPage extends StatelessWidget {
 						),
 					],
 				),
-				//ElevatedButton(
-				//	onPressed: () {
-				//		Navigator.of(context).push(
-				//						MaterialPageRoute(
-				//							builder: (BuildContext context) {
-				//								return SecondPage();
-				//							},
-				//						),
-				//					);
-				//	},
-				//	child: const Text("Button"),
-				//),
 			),
 			bottomNavigationBar: BottomAppBar(
-				color: COLOR_MENU,
+				color: COLOR_MENU_BG,
 				child: Row(children: [
 					IconButton(
 						icon: const Icon(Icons.note_add),
