@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'second_page.dart';
 import 'note_icon.dart';
 
 const Color COLOR_TEXT = Color(0xff000000);
 //const Color COLOR_MENU_TEXT = Color(0xff2E272D);
 const Color COLOR_BACKGROUND = Color(0xffEDF6F9);
+const Color COLOR_BACKGROUND_MID = Color.fromARGB(255, 220, 227, 230);
+const Color COLOR_BACKGROUND_HEAVY = Color.fromARGB(255, 157, 164, 197);
 
 const Color COLOR_MENU_BG = Color(0xffFFDDD2);
 const Color COLOR_MENU_HOT = Color(0xff4FC5B9);

@@ -12,14 +12,14 @@ class UWSeparator extends StatelessWidget {
 		List<Widget> items = [
 		    Expanded(
 					child: Container(
-		    	padding: const EdgeInsets.all(8),
+		    	margin: const EdgeInsets.all(8),
 		    	color: Colors.black,
 		    	height: 6.0,
 		    ),
 			),
 		];
 		if (mode == Mode.edit) {
-			items.add(IconButton(onPressed: (){print("Deleting!");}, icon: Icon(Icons.delete_outline)));
+			items.add(IconButton(onPressed: (){print("Deleting!");}, icon: Icon(Icons.delete)));
 		}
 
 		return Row(

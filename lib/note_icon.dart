@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panels/main.dart';
 
 import 'second_page.dart';
 
@@ -21,7 +22,7 @@ class NoteIcon extends StatelessWidget {
 			child: Container(
 				padding: const EdgeInsets.all(8),
 				decoration: BoxDecoration(
-					color: const Color(0xff7c94b6),
+					color: COLOR_BACKGROUND_HEAVY,
 					border: Border.all(
 						width: 4,
 					),

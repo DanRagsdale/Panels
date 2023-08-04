@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panels/uw_text.dart';
 
 import 'main.dart';
 import 'uw_separator.dart';
@@ -35,19 +36,21 @@ class _SecondPageState extends State<SecondPage> {
 					style: TextStyle(fontWeight: FontWeight.bold),
 				),
 			),
-			body: ListView(
-				padding: const EdgeInsets.all(4),
-			  children: [
-			    Column(
-			    	children: [
-			    			Image.asset(imageSrc),
-			    	],
-			    ),
-					Align(alignment: Alignment.topLeft, child: Icon(Icons.run_circle_rounded)),
-					Align(alignment: Alignment.topLeft, child: Icon(Icons.bike_scooter)),
-					UWSeparator(mode: mode),
-			  ],
-			),
+			body: Container(
+				color: COLOR_BACKGROUND,
+				child: ListView(
+					padding: const EdgeInsets.all(6),
+					children: [
+						Column(
+							children: [
+									Image.asset(imageSrc),
+							],
+						),
+						UWSeparator(mode: mode),
+						UWText(mode),
+					],
+				),
+				),
 			bottomNavigationBar: BottomNavigationBar(
 				backgroundColor: COLOR_MENU_BG,
 				selectedItemColor: COLOR_MENU_HOT,
