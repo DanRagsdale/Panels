@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'main.dart';
+import 'uw_separator.dart';
+
+enum Mode {view, edit}
 
 class SecondPage extends StatefulWidget {
 	final String title;
@@ -12,9 +15,11 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
-	bool isClicked = false;
-	int modeIndex = 0;
 	TextEditingController _controller = TextEditingController();
+	
+	int modeIndex = 0;
+	String imageSrc = "images/aurora.jpg";
+	Mode mode = Mode.view;
 	
 	@override
 	Widget build(BuildContext context) {
@@ -30,19 +35,18 @@ class _SecondPageState extends State<SecondPage> {
 					style: TextStyle(fontWeight: FontWeight.bold),
 				),
 			),
-			body: GestureDetector(
-				onTap: () {
-					setState(() {
-						isClicked = !isClicked;
-					});
-				},
-				child: Column(
-					children: [
-						isClicked ? 
-							Image.asset("images/aurora.jpg") :
-							Image.network("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/NGC_4414_%28NASA-med%29.jpg/726px-NGC_4414_%28NASA-med%29.jpg"),
-					],
-				),
+			body: ListView(
+				padding: const EdgeInsets.all(4),
+			  children: [
+			    Column(
+			    	children: [
+			    			Image.asset(imageSrc),
+			    	],
+			    ),
+					Align(alignment: Alignment.topLeft, child: Icon(Icons.run_circle_rounded)),
+					Align(alignment: Alignment.topLeft, child: Icon(Icons.bike_scooter)),
+					UWSeparator(mode: mode),
+			  ],
 			),
 			bottomNavigationBar: BottomNavigationBar(
 				backgroundColor: COLOR_MENU_BG,
@@ -51,6 +55,7 @@ class _SecondPageState extends State<SecondPage> {
 				currentIndex: modeIndex,
 				onTap: (index) {setState(() {
 				  modeIndex = index;
+					mode = index == 0 ? mode = Mode.view : Mode.edit;
 				});},
 				items: [
 					BottomNavigationBarItem(icon: Icon(Icons.view_column), label: "View Mode"),
