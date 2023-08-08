@@ -1,10 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:panels/uw_text.dart';
+import 'package:panels/user_widget.dart';
 
 import 'main.dart';
 import 'uw_separator.dart';
+import 'uw_text.dart';
+import 'uw_check.dart';
 
 enum Mode {view, edit}
+
+enum UserWidgets {separator, text, check}
+
+class UWController{
+	List<UserWidget> widgets = [];
+
+	void add(UserWidget w) {
+		widgets.add(w);
+	}
+	
+	//void remove()
+}
+
+class UWBuilder extends SliverChildDelegate{
+	final Mode mode;
+	final UWController _controller;
+	
+	UWBuilder(this.mode, this._controller);
+
+	@override
+	Widget? build(BuildContext context, int index) {
+		if (index < _controller.widgets.length){
+			return _controller.widgets[index].build(context, mode);
+		}
+		return null;
+	}
+
+	@override
+	bool shouldRebuild(covariant UWBuilder oldDelegate) {
+		return oldDelegate.mode != mode;
+	}
+}
 
 class SecondPage extends StatefulWidget {
 	final String title;
@@ -16,15 +50,25 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
-	TextEditingController _controller = TextEditingController();
+	TextEditingController titleController = TextEditingController();
 	
 	int modeIndex = 0;
 	String imageSrc = "images/aurora.jpg";
 	Mode mode = Mode.view;
-	
+
+	UWController widgetController = UWController();
+
+	_SecondPageState(){
+		widgetController.add(UWSeparator());
+		widgetController.add(UWText());
+		widgetController.add(UWCheck());
+	}
+
 	@override
 	Widget build(BuildContext context) {
-		_controller.text = widget.title;
+		UWBuilder testBuilder = UWBuilder(mode, widgetController);
+		
+		titleController.text = widget.title;
 
 		return Scaffold(
 			appBar: AppBar(
@@ -32,25 +76,17 @@ class _SecondPageState extends State<SecondPage> {
 				foregroundColor: COLOR_TEXT,
 				title: TextField(
 					decoration: null,
-					controller: _controller,
+					controller: titleController,
 					style: TextStyle(fontWeight: FontWeight.bold),
 				),
 			),
 			body: Container(
 				color: COLOR_BACKGROUND,
-				child: ListView(
+				child: ListView.custom(
 					padding: const EdgeInsets.all(6),
-					children: [
-						Column(
-							children: [
-									Image.asset(imageSrc),
-							],
-						),
-						UWSeparator(mode: mode),
-						UWText(mode),
-					],
+					childrenDelegate: testBuilder,
 				),
-				),
+			),
 			bottomNavigationBar: BottomNavigationBar(
 				backgroundColor: COLOR_MENU_BG,
 				selectedItemColor: COLOR_MENU_HOT,
@@ -69,7 +105,7 @@ class _SecondPageState extends State<SecondPage> {
 
 	@override
 	void dispose() {
-		_controller.dispose();
+		titleController.dispose();
 		super.dispose();
 	}
 }

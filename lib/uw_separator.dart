@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:panels/user_widget.dart';
 
 import 'second_page.dart';
 
-class UWSeparator extends StatelessWidget {
-	UWSeparator({required this.mode});
-
-	final Mode mode;
-
+class UWSeparator extends UserWidget {
+	
 	@override
-	Widget build(BuildContext context) {
+	Widget build(BuildContext context, Mode mode) {
 		List<Widget> items = [
 		    Expanded(
 					child: Container(
