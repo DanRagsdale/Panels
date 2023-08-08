@@ -8,35 +8,64 @@ import 'uw_check.dart';
 
 enum Mode {view, edit}
 
-enum UserWidgets {separator, text, check}
-
-class UWController{
-	List<UserWidget> widgets = [];
-
-	void add(UserWidget w) {
-		widgets.add(w);
-	}
-	
-	//void remove()
-}
-
 class UWBuilder extends SliverChildDelegate{
 	final Mode mode;
-	final UWController _controller;
+	final UWDisplayState widgetController;
 	
-	UWBuilder(this.mode, this._controller);
+	UWBuilder(this.mode, this.widgetController);
 
 	@override
 	Widget? build(BuildContext context, int index) {
-		if (index < _controller.widgets.length){
-			return _controller.widgets[index].build(context, mode);
+		if (index < widgetController.widgets.length){
+			return widgetController.widgets[index].build(context, mode);
 		}
 		return null;
 	}
 
 	@override
 	bool shouldRebuild(covariant UWBuilder oldDelegate) {
-		return oldDelegate.mode != mode;
+		//TODO optimize UserWidget shouldRebuild
+		return true;
+	}
+}
+
+class UWDisplay extends StatefulWidget {
+	final Mode mode;
+	UWDisplay(this.mode);
+
+	@override
+	State<StatefulWidget> createState() => UWDisplayState();
+}
+
+class UWDisplayState extends State<UWDisplay> {
+	List<UserWidget> widgets = [];
+
+	UWDisplayState(){
+		widgets.add(UWSeparator(this));
+		widgets.add(UWCheck(this));
+		widgets.add(UWText(this));
+	}
+
+	void add(UserWidget w) {
+		setState(() {
+			widgets.add(w);
+		});
+	}
+	
+	void remove(UserWidget w){
+		setState(() {
+			widgets.remove(w);
+		});
+	}
+
+	@override
+	Widget build(BuildContext context) {
+		UWBuilder testBuilder = UWBuilder(widget.mode, this);
+
+		return ListView.custom(
+			padding: const EdgeInsets.all(6),
+			childrenDelegate: testBuilder,
+		);
 	}
 }
 
@@ -53,21 +82,12 @@ class _SecondPageState extends State<SecondPage> {
 	TextEditingController titleController = TextEditingController();
 	
 	int modeIndex = 0;
-	String imageSrc = "images/aurora.jpg";
 	Mode mode = Mode.view;
 
-	UWController widgetController = UWController();
-
-	_SecondPageState(){
-		widgetController.add(UWSeparator());
-		widgetController.add(UWText());
-		widgetController.add(UWCheck());
-	}
+	//UWController widgetController = UWController();
 
 	@override
 	Widget build(BuildContext context) {
-		UWBuilder testBuilder = UWBuilder(mode, widgetController);
-		
 		titleController.text = widget.title;
 
 		return Scaffold(
@@ -82,10 +102,7 @@ class _SecondPageState extends State<SecondPage> {
 			),
 			body: Container(
 				color: COLOR_BACKGROUND,
-				child: ListView.custom(
-					padding: const EdgeInsets.all(6),
-					childrenDelegate: testBuilder,
-				),
+				child: UWDisplay(mode),
 			),
 			bottomNavigationBar: BottomNavigationBar(
 				backgroundColor: COLOR_MENU_BG,

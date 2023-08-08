@@ -5,6 +5,8 @@ import 'main.dart';
 import 'second_page.dart';
 
 class UWText extends UserWidget{
+	UWText(UWDisplayState wc) : super(wc);
+
 	TextEditingController _controller = TextEditingController(text: "Test\nText");
 
 	@override
@@ -48,7 +50,7 @@ class UWText extends UserWidget{
 					Row(
 						mainAxisAlignment: MainAxisAlignment.end,
 						children: [
-							IconButton(onPressed: (){}, icon: Icon(Icons.delete)),
+							IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
 							IconButton(onPressed: (){}, icon: Icon(Icons.done)),
 							IconButton(onPressed: (){}, icon: Icon(Icons.add_task)),
 						],

@@ -4,19 +4,37 @@ import 'package:panels/user_widget.dart';
 import 'main.dart';
 import 'second_page.dart';
 
+class PersistentCheck extends StatefulWidget {
+	@override
+	State<StatefulWidget> createState() => _PersistentCheckState();
+}
+
+class _PersistentCheckState extends State<PersistentCheck> {
+	bool state = false;
+	@override
+	Widget build(BuildContext context) {
+		return Checkbox(
+			value: state,
+			onChanged: (val) {
+				setState(() {
+			  	state = val!;
+				});
+			},
+		);
+	}
+}
+
 class UWCheck extends UserWidget {
 	TextEditingController _controller = TextEditingController(text: "Test Check");
+	
+	UWCheck(UWDisplayState wc) : super(wc);
 
 	@override
 	Widget build(BuildContext context, Mode mode) {
-		CheckboxListTile check = CheckboxListTile(
-			title: TextField(
+		PersistentCheck box = PersistentCheck();
+		TextField field = TextField(
 				decoration: null,
 				controller: _controller,
-			),
-			value: true,
-			controlAffinity: ListTileControlAffinity.leading,
-			onChanged: (_) {},
 		);
 		
 		if (mode == Mode.view) {
@@ -29,7 +47,7 @@ class UWCheck extends UserWidget {
 					//),
 					borderRadius: BorderRadius.circular(3),
 				),
-				child: check,
+				child: Row(children: [box, Expanded(child: field)]),
 			);
 		}
 		
@@ -46,8 +64,9 @@ class UWCheck extends UserWidget {
 			child: Row(
 				mainAxisAlignment: MainAxisAlignment.end,
 				children: [
-					Expanded(child: check),
-					IconButton(onPressed: (){}, icon: Icon(Icons.delete)),
+					box,
+					Expanded(child: field),
+					IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
 					IconButton(onPressed: (){}, icon: Icon(Icons.done)),
 					IconButton(onPressed: (){}, icon: Icon(Icons.add_task)),
 				],

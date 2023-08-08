@@ -3,8 +3,9 @@ import 'package:panels/user_widget.dart';
 
 import 'second_page.dart';
 
-class UWSeparator extends UserWidget {
-	
+class UWSeparator extends UserWidget{
+	UWSeparator(UWDisplayState wc) : super(wc);
+
 	@override
 	Widget build(BuildContext context, Mode mode) {
 		List<Widget> items = [
@@ -17,7 +18,15 @@ class UWSeparator extends UserWidget {
 			),
 		];
 		if (mode == Mode.edit) {
-			items.add(IconButton(onPressed: (){print("Deleting!");}, icon: Icon(Icons.delete)));
+			items.add(
+				IconButton(
+					onPressed: (){
+						print("Deleting!");
+						widgetController.remove(this);
+					},
+					icon: Icon(Icons.delete),
+				),
+			);
 		}
 
 		return Row(
