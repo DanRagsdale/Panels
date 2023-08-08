@@ -4,7 +4,7 @@ import 'package:panels/user_widget.dart';
 import 'second_page.dart';
 
 class UWSeparator extends UserWidget{
-	UWSeparator(UWDisplayState wc) : super(wc);
+	UWSeparator(UWControllerState wc) : super(wc);
 
 	@override
 	Widget build(BuildContext context, Mode mode) {

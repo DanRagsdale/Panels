@@ -5,7 +5,7 @@ import 'main.dart';
 import 'second_page.dart';
 
 class UWText extends UserWidget{
-	UWText(UWDisplayState wc) : super(wc);
+	UWText(UWControllerState wc) : super(wc);
 
 	TextEditingController _controller = TextEditingController(text: "Test\nText");
 
@@ -32,7 +32,7 @@ class UWText extends UserWidget{
 					borderRadius: BorderRadius.circular(3),
 				),
 				child: field,
-				);
+			);
 		}
 		
 		return Container(

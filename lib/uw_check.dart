@@ -27,7 +27,7 @@ class _PersistentCheckState extends State<PersistentCheck> {
 class UWCheck extends UserWidget {
 	TextEditingController _controller = TextEditingController(text: "Test Check");
 	
-	UWCheck(UWDisplayState wc) : super(wc);
+	UWCheck(UWControllerState wc) : super(wc);
 
 	@override
 	Widget build(BuildContext context, Mode mode) {
@@ -68,7 +68,7 @@ class UWCheck extends UserWidget {
 					Expanded(child: field),
 					IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
 					IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-					IconButton(onPressed: (){}, icon: Icon(Icons.add_task)),
+					IconButton(onPressed: (){widgetController.insertAfter(this, UWCheck(widgetController));}, icon: Icon(Icons.add_task)),
 				],
 			),
 		);
