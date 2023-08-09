@@ -74,18 +74,31 @@ class UWControllerState extends State<UWController> {
 			),
 		];
 
-		return Container(
-			child: DragAndDropLists(
-				itemDragOnLongPress: false,
-				onItemReorder: (int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-					setState(() {
-						var movedItem = widgets.removeAt(oldItemIndex);
-						widgets.insert(newItemIndex, movedItem);
-					});  
-				},
-				onListReorder: (int oldListIndex, int newListIndex) {  },
-				children: _contents,
-			),
+		return Column(
+			children: [
+				Expanded(
+					child: DragAndDropLists(
+						removeTopPadding: true,
+						itemDragOnLongPress: false,
+						onItemReorder: (int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
+							setState(() {
+								var movedItem = widgets.removeAt(oldItemIndex);
+								widgets.insert(newItemIndex, movedItem);
+							});  
+						},
+						onListReorder: (int oldListIndex, int newListIndex) {  },
+						children: _contents,
+					),
+				),
+				Row(
+					mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+					children: [
+						IconButton(icon: Icon(Icons.wysiwyg), tooltip: "New Text Box", onPressed: () {add(UWText(this));},),
+						IconButton(icon: Icon(Icons.checklist), tooltip: "New Check Box", onPressed: () {add(UWCheck(this));},),
+						IconButton(icon: Icon(Icons.horizontal_rule), tooltip: "New Divider", onPressed: () {add(UWSeparator(this));},),
+					],
+				),
+			],
 		);
 	}
 }
