@@ -17,7 +17,7 @@ class _PersistentCheckState extends State<PersistentCheck> {
 			value: state,
 			onChanged: (val) {
 				setState(() {
-			  	state = val!;
+					state = val!;
 				});
 			},
 		);
@@ -25,7 +25,7 @@ class _PersistentCheckState extends State<PersistentCheck> {
 }
 
 class UWCheck extends UserWidget {
-	TextEditingController _controller = TextEditingController(text: "Test Check");
+	TextEditingController _controller = TextEditingController();
 	
 	UWCheck(UWControllerState wc) : super(wc);
 
@@ -33,7 +33,10 @@ class UWCheck extends UserWidget {
 	Widget build(BuildContext context, Mode mode) {
 		PersistentCheck box = PersistentCheck();
 		TextField field = TextField(
-				decoration: null,
+				decoration: InputDecoration(
+					border: InputBorder.none,
+					hintText: 'Enter a to-do',
+				),
 				controller: _controller,
 		);
 		

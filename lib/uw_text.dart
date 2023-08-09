@@ -7,13 +7,16 @@ import 'second_page.dart';
 class UWText extends UserWidget{
 	UWText(UWControllerState wc) : super(wc);
 
-	TextEditingController _controller = TextEditingController(text: "Test\nText");
+	TextEditingController _controller = TextEditingController();
 
 	@override
 	Widget build(BuildContext context, Mode mode) {
 
 		TextField field = TextField(
-			decoration: null,
+			decoration: InputDecoration(
+				border: InputBorder.none,
+				hintText: 'What is on your mind?',
+			),
 			keyboardType: TextInputType.multiline,
 			controller: _controller,
 			style: TextStyle(fontWeight: FontWeight.bold),
