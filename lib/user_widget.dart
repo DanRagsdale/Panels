@@ -1,3 +1,4 @@
+import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 
 import 'second_page.dart';
@@ -27,6 +28,7 @@ class UWController extends StatefulWidget {
 class UWControllerState extends State<UWController> {
 	List<UserWidget> widgets = [];
 
+	// Test constructor
 	UWControllerState(){
 		widgets.add(UWSeparator(this));
 		widgets.add(UWCheck(this));
@@ -55,35 +57,35 @@ class UWControllerState extends State<UWController> {
 		});
 	}
 
+	// Flutter code
 	@override
 	Widget build(BuildContext context) {
-		UWListBuilder testBuilder = UWListBuilder(widget.mode, this);
-
-		return ListView.custom(
-			padding: const EdgeInsets.all(6),
-			childrenDelegate: testBuilder,
-		);
-	}
-}
-
-// Class that handles populating the Listview with user widgets from the widget controller.
-class UWListBuilder extends SliverChildDelegate{
-	final Mode mode;
-	final UWControllerState widgetController;
-	
-	UWListBuilder(this.mode, this.widgetController);
-
-	@override
-	Widget? build(BuildContext context, int index) {
-		if (index < widgetController.widgets.length){
-			return widgetController.widgets[index].build(context, mode);
+		// View Mode display
+		if(widget.mode == Mode.view) {
+			return ListView(
+				children: widgets.map((e) => e.build(context, widget.mode)).toList(),
+			);
 		}
-		return null;
-	}
 
-	@override
-	bool shouldRebuild(covariant UWListBuilder oldDelegate) {
-		//TODO optimize UserWidget shouldRebuild
-		return true;
+		// Edit Mode display
+		List<DragAndDropList> _contents = [
+			DragAndDropList(
+				children: widgets.map((e) => DragAndDropItem(child: e.build(context, widget.mode))).toList(),
+			),
+		];
+
+		return Container(
+			child: DragAndDropLists(
+				itemDragOnLongPress: false,
+				onItemReorder: (int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
+					setState(() {
+						var movedItem = widgets.removeAt(oldItemIndex);
+						widgets.insert(newItemIndex, movedItem);
+					});  
+				},
+				onListReorder: (int oldListIndex, int newListIndex) {  },
+				children: _contents,
+			),
+		);
 	}
 }

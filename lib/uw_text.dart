@@ -52,7 +52,7 @@ class UWText extends UserWidget{
 						children: [
 							IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
 							IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-							IconButton(onPressed: (){}, icon: Icon(Icons.add_task)),
+							IconButton(onPressed: (){widgetController.insertAfter(this, UWText(widgetController));}, icon: Icon(Icons.add_task)),
 						],
 					),
 			    field,
