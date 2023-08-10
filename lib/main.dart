@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:panels/user_widget_page.dart';
+import 'package:panels/PanelPage.dart';
 import 'package:panels/uw_check.dart';
 import 'package:panels/uw_separator.dart';
 
@@ -59,7 +59,7 @@ class FirstPage extends StatelessWidget {
 					crossAxisCount: 2,
 					children: <Widget>[
 						NoteIcon(
-							initialPage: PanelPage([UWCheckFactory(), UWSeparatorFactory()]),
+							initialPage: PanelPage([UWCheckFactory(GlobalKey()), UWSeparatorFactory(GlobalKey())]),
 						),
 						NoteIcon(
 							initialPage: PanelPage([]),

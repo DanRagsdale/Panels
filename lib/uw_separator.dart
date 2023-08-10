@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:panels/user_widget.dart';
 
+import 'PanelPage.dart';
 import 'editor_page.dart';
 
 class UWSeparatorFactory extends UserWidgetFactory {
+	UWSeparatorFactory(Key key) : super(key);
+
 	@override
-	UserWidget build(PanelControllerState widgetController, {Key? key}) {
-		return UWSeparator(widgetController, key: key);
+	UserWidget build(PanelControllerState widgetController, Mode mode) {
+		return UWSeparator(widgetController, mode, key);
 	}
 }
 
 class UWSeparator extends UserWidget{
-	UWSeparator(PanelControllerState wc, {Key? key}) : super(wc, key: key);
+  UWSeparator(super.widgetController, super.mode, Key key) : super(key: key);
 
 	@override
-	Widget build(BuildContext context, Mode mode) {
+	State<UWSeparator> createState() => _UWSeparatorState();
+}
+
+class _UWSeparatorState extends State<UWSeparator> {
+	@override
+	Widget build(BuildContext context) {
 		List<Widget> items = [
 			Expanded(
 				child: Container(
@@ -24,11 +32,11 @@ class UWSeparator extends UserWidget{
 				),
 			),
 		];
-		if (mode == Mode.edit) {
+		if (widget.mode == Mode.edit) {
 			items.add(
 				IconButton(
 					onPressed: (){
-						widgetController.remove(this);
+						widget.controller.remove(widget.key!);
 					},
 					icon: Icon(Icons.delete),
 				),
@@ -36,7 +44,6 @@ class UWSeparator extends UserWidget{
 		}
 
 		return Row(
-			key: key,
 			children: items,
 		);
 	}

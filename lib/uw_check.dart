@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:panels/user_widget.dart';
 
+import 'PanelPage.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
@@ -25,19 +26,26 @@ class _PersistentCheckState extends State<PersistentCheck> {
 }
 
 class UWCheckFactory extends UserWidgetFactory {
+	UWCheckFactory(Key key) : super(key);
+
 	@override
-	UserWidget build(PanelControllerState widgetController, {Key? key}) {
-		return UWCheck(widgetController, key: key);
+	UserWidget build(PanelControllerState widgetController, Mode mode) {
+		return UWCheck(widgetController, mode, key);
 	}
 }
 
 class UWCheck extends UserWidget {
-	TextEditingController _controller = TextEditingController();
-	
-	UWCheck(PanelControllerState wc, {Key? key}) : super(wc, key: key);
+  UWCheck(super.widgetController, super.mode, Key key) : super(key: key);
 
 	@override
-	Widget build(BuildContext context, Mode mode) {
+	State<StatefulWidget> createState() => _UWCheckState();
+}
+
+class _UWCheckState extends State<UWCheck> {
+	TextEditingController _controller = TextEditingController();
+
+	@override
+	Widget build(BuildContext context) {
 		PersistentCheck box = PersistentCheck();
 		TextField field = TextField(
 				decoration: InputDecoration(
@@ -47,9 +55,8 @@ class UWCheck extends UserWidget {
 				controller: _controller,
 		);
 		
-		if (mode == Mode.view) {
+		if (widget.mode == Mode.view) {
 			return Container(
-				key: key,
 				padding: EdgeInsets.all(3),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
@@ -63,7 +70,6 @@ class UWCheck extends UserWidget {
 		}
 		
 		return Container(
-			key: key,
 			padding: EdgeInsets.all(3),
 			decoration: BoxDecoration(
 				color: COLOR_BACKGROUND_MID,
@@ -78,9 +84,9 @@ class UWCheck extends UserWidget {
 				children: [
 					box,
 					Expanded(child: field),
-					IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
+					IconButton(onPressed: (){widget.controller.remove(widget.key!);}, icon: Icon(Icons.delete)),
 					//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-					IconButton(onPressed: (){widgetController.insertAfter(this, UWCheck(widgetController, key: widgetController.getKey()));}, icon: Icon(Icons.add_task)),
+					IconButton(onPressed: (){widget.controller.insertAfter(widget.key!, UWCheckFactory(GlobalKey()));}, icon: Icon(Icons.add_task)),
 				],
 			),
 		);

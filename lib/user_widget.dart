@@ -1,6 +1,6 @@
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
-import 'package:panels/user_widget_page.dart';
+import 'package:panels/PanelPage.dart';
 
 import 'editor_page.dart';
 import 'uw_separator.dart';
@@ -9,20 +9,13 @@ import 'uw_text.dart';
 
 // Class for user editable widgets
 // Within flutter, this functions as a widget builder, not a proper flutter widget
-abstract class UserWidget {
-	final PanelControllerState widgetController;
-	final Key? key;
+abstract class UserWidget extends StatefulWidget {
+	final PanelControllerState controller;
+	final Mode mode;
 
-	// May remove the requirement for keys.
-	// Keys are needed for ReorderableListView but not for DragAndDropLists	
-	UserWidget(this.widgetController, {Key? this.key});
-
-	Widget build(BuildContext context, Mode mode);
+	UserWidget(this.controller, this.mode, {required Key key}) : super(key: key);
 }
 
-abstract class UserWidgetFactory {
-	UserWidget build(PanelControllerState widgetController, {Key? key});
-}
 
 
 
@@ -38,7 +31,7 @@ class PanelController extends StatefulWidget {
 
 // Backend for the procedural list of user widgets
 class PanelControllerState extends State<PanelController> {
-	List<UserWidget> widgets = [];
+	late PanelPage widgetPage;
 
 	// Test constructor
 	
@@ -46,34 +39,32 @@ class PanelControllerState extends State<PanelController> {
 	void initState() {
 		super.initState();
 
-		widgets = widget.initialPage.BuildWidgetList(this);
+		widgetPage = widget.initialPage;
 	}
 
-	int key_counter = 0;
-	Key getKey() {
-		key_counter++;
-		return Key("UW-" + key_counter.toString());
-	}
+	// Needed to switch to using GlobalKeys in order to preserve state across mode switches
+	//int key_counter = 0;
+	//Key getKey() {
+	//	key_counter++;
+	//	return Key("Proc-" + key_counter.toString());
+	//}
 
-	void add(UserWidget w) {
+	void add(UserWidgetFactory w) {
 		setState(() {
-			widgets.add(w);
+			widgetPage.add(w);
 		});
 	}
 
 	// Inserts widget w into the list immediatly after widget i
-	void insertAfter(UserWidget i, UserWidget w) {
-		int index = widgets.indexOf(i);
-		if (index >= 0) {
-			setState(() {
-				widgets.insert(index + 1, w);
-			});
-		}
+	void insertAfter(Key k, UserWidgetFactory w) {
+		setState(() {
+			widgetPage.insertAfter(k, w);
+		});
 	}
 	
-	void remove(UserWidget w){
+	void remove(Key k){
 		setState(() {
-			widgets.remove(w);
+			widgetPage.remove(k);
 		});
 	}
 
@@ -83,7 +74,7 @@ class PanelControllerState extends State<PanelController> {
 		// View Mode display
 		if(widget.mode == Mode.view) {
 			return ListView(
-				children: widgets.map((e) => e.build(context, widget.mode)).toList(),
+				children: widgetPage.buildWidgetList(this, Mode.view),
 			);
 		}
 
@@ -93,7 +84,7 @@ class PanelControllerState extends State<PanelController> {
 
 		List<DragAndDropList> _contents = [
 			DragAndDropList(
-				children: widgets.map((e) => DragAndDropItem(child: e.build(context, widget.mode))).toList(),
+				children: widgetPage.buildWidgetList(this, Mode.edit).map((e) => DragAndDropItem(child: e)).toList(),
 			),
 		];
 
@@ -101,10 +92,10 @@ class PanelControllerState extends State<PanelController> {
 				removeTopPadding: true,
 				itemDragOnLongPress: false,
 				onItemReorder: (int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-					setState(() {
-						var movedItem = widgets.removeAt(oldItemIndex);
-						widgets.insert(newItemIndex, movedItem);
-					});  
+					//setState(() {
+					//	var movedItem = widgetPage.removeAt(oldItemIndex);
+					//	widgetPage.insert(newItemIndex, movedItem);
+					//});  
 				},
 				onListReorder: (int oldListIndex, int newListIndex) {  },
 				children: _contents,
@@ -132,9 +123,9 @@ class PanelControllerState extends State<PanelController> {
 				Row(
 					mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 					children: [
-						IconButton(icon: Icon(Icons.wysiwyg), tooltip: "New Text Box", onPressed: () {add(UWText(this, key: getKey()));},),
-						IconButton(icon: Icon(Icons.checklist), tooltip: "New Check Box", onPressed: () {add(UWCheck(this, key: getKey()));},),
-						IconButton(icon: Icon(Icons.horizontal_rule), tooltip: "New Divider", onPressed: () {add(UWSeparator(this, key: getKey()));},),
+						IconButton(icon: Icon(Icons.wysiwyg), tooltip: "New Text Box", onPressed: () {add(UWTextFactory(GlobalKey()));},),
+						IconButton(icon: Icon(Icons.checklist), tooltip: "New Check Box", onPressed: () {add(UWCheckFactory(GlobalKey()));},),
+						IconButton(icon: Icon(Icons.horizontal_rule), tooltip: "New Divider", onPressed: () {add(UWSeparatorFactory(GlobalKey()));},),
 					],
 				),
 			],

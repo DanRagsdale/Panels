@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:panels/user_widget.dart';
 
+import 'PanelPage.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
 class UWTextFactory extends UserWidgetFactory {
+	UWTextFactory(Key key) : super(key);
+
 	@override
-	UserWidget build(PanelControllerState widgetController, {Key? key}) {
-		return UWText(widgetController, key: key);
+	UserWidget build(PanelControllerState widgetController, Mode mode) {
+		return UWText(widgetController, mode, key);
 	}
 }
 
 class UWText extends UserWidget{
-	UWText(PanelControllerState wc, {Key? key}) : super(wc, key: key);
+  UWText(super.widgetController, super.mode, Key key) : super(key: key);
 
+	@override
+	State<StatefulWidget> createState() => _UWTextState();
+}
+
+class _UWTextState extends State<UWText> {
 	TextEditingController _controller = TextEditingController();
 
 	@override
-	Widget build(BuildContext context, Mode mode) {
+	Widget build(BuildContext context) {
 		TextField field = TextField(
 			decoration: InputDecoration(
 				border: InputBorder.none,
@@ -30,9 +38,8 @@ class UWText extends UserWidget{
 			maxLines: 1024,
 		);
 
-		if (mode == Mode.view) {
+		if (widget.mode == Mode.view) {
 			return Container(
-				key: key,
 				padding: EdgeInsets.all(3),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
@@ -46,7 +53,6 @@ class UWText extends UserWidget{
 		}
 		
 		return Container(
-			key: key,
 			padding: EdgeInsets.all(3),
 			decoration: BoxDecoration(
 				color: COLOR_BACKGROUND_MID,
@@ -61,9 +67,9 @@ class UWText extends UserWidget{
 					Row(
 						mainAxisAlignment: MainAxisAlignment.end,
 						children: [
-							IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
+							IconButton(onPressed: (){widget.controller.remove(widget.key!);}, icon: Icon(Icons.delete)),
 							//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-							IconButton(onPressed: (){widgetController.insertAfter(this, UWText(widgetController, key: widgetController.getKey()));}, icon: Icon(Icons.add_task)),
+							IconButton(onPressed: (){widget.controller.insertAfter(widget.key!, UWTextFactory(GlobalKey()));}, icon: Icon(Icons.add_task)),
 						],
 					),
 			    field,

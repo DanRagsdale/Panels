@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panels/user_widget.dart';
-import 'package:panels/user_widget_page.dart';
+import 'package:panels/PanelPage.dart';
 
 import 'main.dart';
 
