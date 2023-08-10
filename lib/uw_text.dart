@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:panels/user_widget.dart';
 
 import 'main.dart';
-import 'second_page.dart';
+import 'editor_page.dart';
+
+class UWTextFactory extends UserWidgetFactory {
+	@override
+	UserWidget build(PanelControllerState widgetController, {Key? key}) {
+		return UWText(widgetController, key: key);
+	}
+}
 
 class UWText extends UserWidget{
-	UWText(UWControllerState wc) : super(wc);
+	UWText(PanelControllerState wc, {Key? key}) : super(wc, key: key);
 
 	TextEditingController _controller = TextEditingController();
 
 	@override
 	Widget build(BuildContext context, Mode mode) {
-
 		TextField field = TextField(
 			decoration: InputDecoration(
 				border: InputBorder.none,
@@ -26,6 +32,7 @@ class UWText extends UserWidget{
 
 		if (mode == Mode.view) {
 			return Container(
+				key: key,
 				padding: EdgeInsets.all(3),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
@@ -39,6 +46,7 @@ class UWText extends UserWidget{
 		}
 		
 		return Container(
+			key: key,
 			padding: EdgeInsets.all(3),
 			decoration: BoxDecoration(
 				color: COLOR_BACKGROUND_MID,
@@ -54,8 +62,8 @@ class UWText extends UserWidget{
 						mainAxisAlignment: MainAxisAlignment.end,
 						children: [
 							IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
-							IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-							IconButton(onPressed: (){widgetController.insertAfter(this, UWText(widgetController));}, icon: Icon(Icons.add_task)),
+							//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
+							IconButton(onPressed: (){widgetController.insertAfter(this, UWText(widgetController, key: widgetController.getKey()));}, icon: Icon(Icons.add_task)),
 						],
 					),
 			    field,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:panels/user_widget_page.dart';
+import 'package:panels/uw_check.dart';
+import 'package:panels/uw_separator.dart';
 
 import 'note_icon.dart';
 
@@ -56,16 +59,13 @@ class FirstPage extends StatelessWidget {
 					crossAxisCount: 2,
 					children: <Widget>[
 						NoteIcon(
-							title: "Argument Test",
-							preview: "Here dead lie we, because we did not choose, to live and...",
+							initialPage: PanelPage([UWCheckFactory(), UWSeparatorFactory()]),
 						),
 						NoteIcon(
-							title: "Second Test",
-								preview: "shame the land from which we sprung.",
+							initialPage: PanelPage([]),
 						),
 						NoteIcon(
-							title: "Third Test",
-							preview: "Life, to be sure, is nothing much to lose;",
+							initialPage: PanelPage([]),
 						),
 					],
 				),

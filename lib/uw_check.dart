@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:panels/user_widget.dart';
 
 import 'main.dart';
-import 'second_page.dart';
+import 'editor_page.dart';
 
 class PersistentCheck extends StatefulWidget {
 	@override
@@ -24,10 +24,17 @@ class _PersistentCheckState extends State<PersistentCheck> {
 	}
 }
 
+class UWCheckFactory extends UserWidgetFactory {
+	@override
+	UserWidget build(PanelControllerState widgetController, {Key? key}) {
+		return UWCheck(widgetController, key: key);
+	}
+}
+
 class UWCheck extends UserWidget {
 	TextEditingController _controller = TextEditingController();
 	
-	UWCheck(UWControllerState wc) : super(wc);
+	UWCheck(PanelControllerState wc, {Key? key}) : super(wc, key: key);
 
 	@override
 	Widget build(BuildContext context, Mode mode) {
@@ -42,6 +49,7 @@ class UWCheck extends UserWidget {
 		
 		if (mode == Mode.view) {
 			return Container(
+				key: key,
 				padding: EdgeInsets.all(3),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
@@ -55,6 +63,7 @@ class UWCheck extends UserWidget {
 		}
 		
 		return Container(
+			key: key,
 			padding: EdgeInsets.all(3),
 			decoration: BoxDecoration(
 				color: COLOR_BACKGROUND_MID,
@@ -70,8 +79,8 @@ class UWCheck extends UserWidget {
 					box,
 					Expanded(child: field),
 					IconButton(onPressed: (){widgetController.remove(this);}, icon: Icon(Icons.delete)),
-					IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-					IconButton(onPressed: (){widgetController.insertAfter(this, UWCheck(widgetController));}, icon: Icon(Icons.add_task)),
+					//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
+					IconButton(onPressed: (){widgetController.insertAfter(this, UWCheck(widgetController, key: widgetController.getKey()));}, icon: Icon(Icons.add_task)),
 				],
 			),
 		);

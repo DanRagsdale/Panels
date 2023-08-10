@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:panels/main.dart';
+import 'package:panels/user_widget_page.dart';
 
-import 'second_page.dart';
+import 'editor_page.dart';
 
 class NoteIcon extends StatelessWidget {
-	NoteIcon({required this.title, required this.preview});
-
-	final String title;
-	final String preview;
+	final PanelPage initialPage;
 	
+	NoteIcon({required this.initialPage});
+
 	@override
 	Widget build(BuildContext context) {
 		return GestureDetector(
 			onTap: () {
 				Navigator.of(context).push(
 					MaterialPageRoute(
-						builder: (context) => SecondPage(this.title)
+						builder: (context) => EditorPage(initialPage: initialPage)
 					),
 				);
 			},
@@ -30,8 +30,8 @@ class NoteIcon extends StatelessWidget {
 				),
 				child: Column(
 					children: [
-						Text(this.title, style: TextStyle(fontWeight: FontWeight.bold)),
-						Text(this.preview),
+						Text(initialPage.getTitle(), style: TextStyle(fontWeight: FontWeight.bold)),
+						Text(initialPage.getPreview()),
 					],
 				),
 			),

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:panels/user_widget.dart';
+import 'package:panels/user_widget_page.dart';
 
 import 'main.dart';
 
 enum Mode {view, edit}
 
-class SecondPage extends StatefulWidget {
-	final String title;
+class EditorPage extends StatefulWidget {
+	final PanelPage initialPage;
 
-	SecondPage(this.title, {Key? key}) : super(key: key);
+	EditorPage({required this.initialPage, Key? key}) : super(key: key);
 
 	@override
-	State<SecondPage> createState() => _SecondPageState();
+	State<EditorPage> createState() => _EditorPageState();
 }
 
-class _SecondPageState extends State<SecondPage> {
+class _EditorPageState extends State<EditorPage> {
 	TextEditingController titleController = TextEditingController();
 	
 	int modeIndex = 0;
@@ -22,7 +23,7 @@ class _SecondPageState extends State<SecondPage> {
 
 	@override
 	Widget build(BuildContext context) {
-		titleController.text = widget.title;
+		titleController.text = widget.initialPage.getTitle();
 
 		return Scaffold(
 			appBar: AppBar(
@@ -36,7 +37,7 @@ class _SecondPageState extends State<SecondPage> {
 			),
 			body: Container(
 				color: COLOR_BACKGROUND,
-				child: UWController(mode),
+				child: PanelController(initialPage: widget.initialPage, mode: mode),
 			),
 			bottomNavigationBar: BottomNavigationBar(
 				backgroundColor: COLOR_MENU_BG,
