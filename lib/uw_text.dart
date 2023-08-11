@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:panels/panel_controller.dart';
 import 'package:panels/user_widget.dart';
 
-import 'PanelPage.dart';
+import 'panel_page.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
@@ -9,8 +10,8 @@ class UWTextFactory extends UserWidgetFactory {
 	UWTextFactory(Key key) : super(key);
 
 	@override
-	UserWidget build(PanelControllerState widgetController, Mode mode) {
-		return UWText(widgetController, mode, key);
+	UserWidget build(PanelControllerState page, Mode mode) {
+		return UWText(page, mode, key);
 	}
 }
 
@@ -27,6 +28,7 @@ class _UWTextState extends State<UWText> {
 	@override
 	Widget build(BuildContext context) {
 		TextField field = TextField(
+			//enabled: widget.mode == Mode.view,
 			decoration: InputDecoration(
 				border: InputBorder.none,
 				hintText: 'What is on your mind?',
@@ -67,9 +69,19 @@ class _UWTextState extends State<UWText> {
 					Row(
 						mainAxisAlignment: MainAxisAlignment.end,
 						children: [
-							IconButton(onPressed: (){widget.controller.remove(widget.key!);}, icon: Icon(Icons.delete)),
+							IconButton(
+								icon: Icon(Icons.delete),
+								onPressed: (){
+									widget.controller.remove(widget.key!);
+								},
+							),
 							//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-							IconButton(onPressed: (){widget.controller.insertAfter(widget.key!, UWTextFactory(GlobalKey()));}, icon: Icon(Icons.add_task)),
+							IconButton(
+								icon: Icon(Icons.add_task),
+								onPressed: (){
+									widget.controller.insertAfter(widget.key!, UWTextFactory(GlobalKey()));
+								},
+							),
 						],
 					),
 			    field,

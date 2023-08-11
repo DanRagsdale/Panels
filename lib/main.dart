@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:panels/PanelPage.dart';
+import 'package:panels/panel_page.dart';
 import 'package:panels/uw_check.dart';
 import 'package:panels/uw_separator.dart';
 

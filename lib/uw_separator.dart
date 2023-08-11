@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:panels/panel_controller.dart';
 import 'package:panels/user_widget.dart';
 
-import 'PanelPage.dart';
+import 'panel_page.dart';
 import 'editor_page.dart';
 
 class UWSeparatorFactory extends UserWidgetFactory {
 	UWSeparatorFactory(Key key) : super(key);
 
 	@override
-	UserWidget build(PanelControllerState widgetController, Mode mode) {
-		return UWSeparator(widgetController, mode, key);
+	UserWidget build(PanelControllerState page, Mode mode) {
+		return UWSeparator(page, mode, key);
 	}
 }
 
@@ -35,10 +36,10 @@ class _UWSeparatorState extends State<UWSeparator> {
 		if (widget.mode == Mode.edit) {
 			items.add(
 				IconButton(
-					onPressed: (){
-						widget.controller.remove(widget.key!);
-					},
 					icon: Icon(Icons.delete),
+					onPressed: () {
+						setState(() => widget.controller.remove(widget.key!));
+					},
 				),
 			);
 		}

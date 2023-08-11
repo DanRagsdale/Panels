@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panels/main.dart';
-import 'package:panels/PanelPage.dart';
+import 'package:panels/panel_page.dart';
 
 import 'editor_page.dart';
 

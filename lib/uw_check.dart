@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:panels/panel_controller.dart';
 import 'package:panels/user_widget.dart';
 
-import 'PanelPage.dart';
+import 'panel_page.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
@@ -29,8 +30,8 @@ class UWCheckFactory extends UserWidgetFactory {
 	UWCheckFactory(Key key) : super(key);
 
 	@override
-	UserWidget build(PanelControllerState widgetController, Mode mode) {
-		return UWCheck(widgetController, mode, key);
+	UserWidget build(PanelControllerState page, Mode mode) {
+		return UWCheck(page, mode, key);
 	}
 }
 
@@ -48,11 +49,12 @@ class _UWCheckState extends State<UWCheck> {
 	Widget build(BuildContext context) {
 		PersistentCheck box = PersistentCheck();
 		TextField field = TextField(
-				decoration: InputDecoration(
-					border: InputBorder.none,
-					hintText: 'Enter a to-do',
-				),
-				controller: _controller,
+			//enabled: widget.mode == Mode.view,
+			decoration: InputDecoration(
+				border: InputBorder.none,
+				hintText: 'Enter a to-do',
+			),
+			controller: _controller,
 		);
 		
 		if (widget.mode == Mode.view) {
@@ -84,9 +86,19 @@ class _UWCheckState extends State<UWCheck> {
 				children: [
 					box,
 					Expanded(child: field),
-					IconButton(onPressed: (){widget.controller.remove(widget.key!);}, icon: Icon(Icons.delete)),
+					IconButton(
+						icon: Icon(Icons.delete),
+						onPressed: () {
+							widget.controller.remove(widget.key!);
+						},
+					),
 					//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-					IconButton(onPressed: (){widget.controller.insertAfter(widget.key!, UWCheckFactory(GlobalKey()));}, icon: Icon(Icons.add_task)),
+					IconButton(
+						icon: Icon(Icons.add_task),
+						onPressed: (){
+							widget.controller.insertAfter(widget.key!, UWCheckFactory(GlobalKey()));
+						},
+					),
 				],
 			),
 		);
