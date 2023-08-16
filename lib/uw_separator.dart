@@ -12,6 +12,9 @@ class UWSeparatorFactory extends UserWidgetFactory {
 	UserWidget build(PanelControllerState page, Mode mode) {
 		return UWSeparator(page, mode, key);
 	}
+	
+	@override	
+	String previewString() => "Separator";
 }
 
 class UWSeparator extends UserWidget{

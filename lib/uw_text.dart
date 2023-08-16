@@ -13,6 +13,9 @@ class UWTextFactory extends UserWidgetFactory {
 	UserWidget build(PanelControllerState page, Mode mode) {
 		return UWText(page, mode, key);
 	}
+	
+	@override	
+	String previewString() => "Text Box";
 }
 
 class UWText extends UserWidget{
@@ -23,7 +26,7 @@ class UWText extends UserWidget{
 }
 
 class _UWTextState extends State<UWText> {
-	TextEditingController _controller = TextEditingController();
+	TextEditingController _textController = TextEditingController();
 
 	@override
 	Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class _UWTextState extends State<UWText> {
 				hintText: 'What is on your mind?',
 			),
 			keyboardType: TextInputType.multiline,
-			controller: _controller,
+			controller: _textController,
 			style: TextStyle(fontWeight: FontWeight.bold),
 			minLines: 1,
 			maxLines: 1024,
@@ -88,5 +91,11 @@ class _UWTextState extends State<UWText> {
 			  ],
 			),
 		);
+	}
+	
+	@override
+	void dispose() {
+		_textController.dispose();
+		super.dispose();
 	}
 }

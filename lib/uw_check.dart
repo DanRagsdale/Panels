@@ -6,32 +6,17 @@ import 'panel_page.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
-class PersistentCheck extends StatefulWidget {
-	@override
-	State<StatefulWidget> createState() => _PersistentCheckState();
-}
-
-class _PersistentCheckState extends State<PersistentCheck> {
-	bool state = false;
-	@override
-	Widget build(BuildContext context) {
-		return Checkbox(
-			value: state,
-			onChanged: (val) {
-				setState(() {
-					state = val!;
-				});
-			},
-		);
-	}
-}
-
 class UWCheckFactory extends UserWidgetFactory {
 	UWCheckFactory(Key key) : super(key);
 
 	@override
 	UserWidget build(PanelControllerState page, Mode mode) {
 		return UWCheck(page, mode, key);
+	}
+
+	@override	
+	String previewString() {
+		return "Checkbox";
 	}
 }
 
@@ -43,18 +28,26 @@ class UWCheck extends UserWidget {
 }
 
 class _UWCheckState extends State<UWCheck> {
-	TextEditingController _controller = TextEditingController();
+	TextEditingController _textController = TextEditingController();
+	bool checkState = false;
 
 	@override
 	Widget build(BuildContext context) {
-		PersistentCheck box = PersistentCheck();
+		Checkbox box = Checkbox(
+ 			value: checkState,
+			onChanged: (bool? value) { 
+				setState(() {
+					checkState = value!;
+				});
+			},
+		);
 		TextField field = TextField(
 			//enabled: widget.mode == Mode.view,
 			decoration: InputDecoration(
 				border: InputBorder.none,
 				hintText: 'Enter a to-do',
 			),
-			controller: _controller,
+			controller: _textController,
 		);
 		
 		if (widget.mode == Mode.view) {
@@ -102,5 +95,11 @@ class _UWCheckState extends State<UWCheck> {
 				],
 			),
 		);
+	}
+	
+	@override
+	void dispose() {
+		_textController.dispose();
+		super.dispose();
 	}
 }

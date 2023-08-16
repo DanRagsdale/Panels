@@ -16,14 +16,16 @@ class EditorPage extends StatefulWidget {
 }
 
 class _EditorPageState extends State<EditorPage> {
-	TextEditingController titleController = TextEditingController();
+	TextEditingController _titleController = TextEditingController();
 	
 	int modeIndex = 0;
 	Mode mode = Mode.view;
 
 	@override
 	Widget build(BuildContext context) {
-		titleController.text = widget.initialPage.getTitle();
+		_titleController.text = widget.initialPage.title;
+
+		print("Rebuilding page 2");
 
 		return Scaffold(
 			appBar: AppBar(
@@ -31,8 +33,9 @@ class _EditorPageState extends State<EditorPage> {
 				foregroundColor: COLOR_TEXT,
 				title: TextField(
 					decoration: null,
-					controller: titleController,
+					controller: _titleController,
 					style: TextStyle(fontWeight: FontWeight.bold),
+					onChanged: (value) => widget.initialPage.title = value,
 				),
 			),
 			body: Container(
@@ -58,7 +61,7 @@ class _EditorPageState extends State<EditorPage> {
 
 	@override
 	void dispose() {
-		titleController.dispose();
+		_titleController.dispose();
 		super.dispose();
 	}
 }

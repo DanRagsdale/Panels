@@ -9,13 +9,27 @@ abstract class UserWidgetFactory {
 	UserWidgetFactory(this.key);
 
 	UserWidget build(PanelControllerState page, Mode mode);
+
+	String previewString();
 }
 
 class PanelPage {
+	String title;
 	List<UserWidgetFactory> widgetFactories;
 
-	PanelPage(this.widgetFactories);
+	PanelPage(this.title, this.widgetFactories);
 
+
+	String getPreview() {
+		String output = "";
+		for (var w in widgetFactories) {
+			output += w.previewString() + "\n";
+		}
+
+		return output;
+	}
+
+	// Widget list methods
 	void add(UserWidgetFactory w) => widgetFactories.add(w);
 	
 	void insert(int index, UserWidgetFactory w) {
@@ -46,13 +60,5 @@ class PanelPage {
 		}
 
 		return outputList;
-	}
-
-	String getPreview() {
-		return "Preview!";
-	}
-
-	String getTitle() {
-		return "Title!";
 	}
 }

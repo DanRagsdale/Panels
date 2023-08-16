@@ -20,7 +20,7 @@ class PanelController extends StatefulWidget {
 class PanelControllerState extends State<PanelController> {
 	late PanelPage widgetPage;
 
-	// These functions update the backend AND force the list to update its state
+	// These functions update the backend AND force the list to update its display 
 	void add(UserWidgetFactory w) => setState(() => widgetPage.add(w));
 	void insert(int index, UserWidgetFactory w) => setState(() => widgetPage.insert(index, w));
 	void insertAfter(Key k, UserWidgetFactory w) => setState(() => widgetPage.insertAfter(k, w));
@@ -48,7 +48,8 @@ class PanelControllerState extends State<PanelController> {
 		// Edit Mode display
 		// Not yet sure which implementation of a reorderable list works better
 		// The DragAndDropLists seem more stable, but have some weird behavior
-		// DragAndDropLists also through GlobalKeyExceptions, which is annoying
+		// DragAndDropLists throw GlobalKeyExceptions, which is annoying
+		// ReorderableList occasionally freezes, seemingly at random
 
 		//List<DragAndDropList> _contents = [
 		//	DragAndDropList(

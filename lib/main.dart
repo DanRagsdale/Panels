@@ -29,15 +29,31 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 	@override
 	Widget build(BuildContext context) {
-		return const MaterialApp(
+		return MaterialApp(
 			//debugShowCheckedModeBanner: false,
 			home: FirstPage(),
 		);
 	}
 }
 
-class FirstPage extends StatelessWidget {
-	const FirstPage({Key? key}) : super(key: key);
+class FirstPage extends StatefulWidget {
+	@override
+	State<FirstPage> createState() => _FirstPageState();
+}
+
+class _FirstPageState extends State<FirstPage> {
+	List<PanelPage> panels = [
+		PanelPage("Example", [UWCheckFactory(GlobalKey()), UWSeparatorFactory(GlobalKey())]),
+		PanelPage("Empty 1", []),
+		PanelPage("Empty 2", []),
+	];
+
+	void refreshCallback() {
+		print("calling back");
+		setState(() {
+		  
+		});
+	}
 
 	@override
 	Widget build(BuildContext context) {
@@ -57,17 +73,8 @@ class FirstPage extends StatelessWidget {
 					crossAxisSpacing: 10,
 					mainAxisSpacing: 10,
 					crossAxisCount: 2,
-					children: <Widget>[
-						NoteIcon(
-							initialPage: PanelPage([UWCheckFactory(GlobalKey()), UWSeparatorFactory(GlobalKey())]),
-						),
-						NoteIcon(
-							initialPage: PanelPage([]),
-						),
-						NoteIcon(
-							initialPage: PanelPage([]),
-						),
-					],
+					children: panels.map((e) => NoteIcon(initialPage: e, refreshCallback: refreshCallback,)).toList(),
+					//],
 				),
 			),
 			bottomNavigationBar: BottomAppBar(
