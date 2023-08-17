@@ -5,11 +5,11 @@ import 'package:panels/user_widget.dart';
 import 'panel_page.dart';
 import 'editor_page.dart';
 
-class UWSeparatorFactory extends UserWidgetFactory {
+class UWSeparatorFactory extends UWFactory<UWSeparator> {
 	UWSeparatorFactory(Key key) : super(key);
 
 	@override
-	UserWidget build(PanelControllerState page, Mode mode) {
+	UWSeparator build(PanelControllerState page, Mode mode) {
 		return UWSeparator(page, mode, key);
 	}
 	

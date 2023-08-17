@@ -4,18 +4,18 @@ import 'package:panels/user_widget.dart';
 
 import 'editor_page.dart';
 
-abstract class UserWidgetFactory {
+abstract class UWFactory<T extends UserWidget> {
 	final Key key;
-	UserWidgetFactory(this.key);
+	UWFactory(this.key);
 
-	UserWidget build(PanelControllerState page, Mode mode);
+	T build(PanelControllerState page, Mode mode);
 
 	String previewString();
 }
 
 class PanelPage {
 	String title;
-	List<UserWidgetFactory> widgetFactories;
+	List<UWFactory> widgetFactories;
 
 	PanelPage(this.title, this.widgetFactories);
 
@@ -30,14 +30,14 @@ class PanelPage {
 	}
 
 	// Widget list methods
-	void add(UserWidgetFactory w) => widgetFactories.add(w);
+	void add(UWFactory w) => widgetFactories.add(w);
 	
-	void insert(int index, UserWidgetFactory w) {
+	void insert(int index, UWFactory w) {
 		widgetFactories.insert(index, w);
 	}
 
 	// Inserts widget w into the list immediatly after widget with key k
-	void insertAfter(Key k, UserWidgetFactory w) {
+	void insertAfter(Key k, UWFactory w) {
 		int index = widgetFactories.indexWhere((e) => e.key == k);
 		if (index >= 0) {
 			widgetFactories.insert(index + 1, w);
@@ -48,7 +48,7 @@ class PanelPage {
 		widgetFactories.removeWhere((e) => (e.key == k));
 	}
 	
-	UserWidgetFactory removeAt(int index) {
+	UWFactory removeAt(int index) {
 		return widgetFactories.removeAt(index);
 	}
 

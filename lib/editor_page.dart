@@ -25,8 +25,6 @@ class _EditorPageState extends State<EditorPage> {
 	Widget build(BuildContext context) {
 		_titleController.text = widget.initialPage.title;
 
-		print("Rebuilding page 2");
-
 		return Scaffold(
 			appBar: AppBar(
 				backgroundColor: COLOR_MENU_BG,

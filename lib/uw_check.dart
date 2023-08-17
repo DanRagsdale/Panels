@@ -6,12 +6,15 @@ import 'panel_page.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
-class UWCheckFactory extends UserWidgetFactory {
+class UWCheckFactory extends UWFactory<UWCheck> {
+	bool state = false;
+	String text = "";
+	
 	UWCheckFactory(Key key) : super(key);
 
 	@override
-	UserWidget build(PanelControllerState page, Mode mode) {
-		return UWCheck(page, mode, key);
+	UWCheck build(PanelControllerState page, Mode mode) {
+		return UWCheck(page, mode, this, key);
 	}
 
 	@override	
@@ -21,7 +24,9 @@ class UWCheckFactory extends UserWidgetFactory {
 }
 
 class UWCheck extends UserWidget {
-  UWCheck(super.widgetController, super.mode, Key key) : super(key: key);
+	final UWCheckFactory factory;
+
+  UWCheck(super.widgetController, super.mode, this.factory, Key key) : super(key: key);
 
 	@override
 	State<StatefulWidget> createState() => _UWCheckState();
@@ -29,15 +34,20 @@ class UWCheck extends UserWidget {
 
 class _UWCheckState extends State<UWCheck> {
 	TextEditingController _textController = TextEditingController();
-	bool checkState = false;
+
+	@override
+	void initState() {
+		_textController.text = widget.factory.text;
+		super.initState();
+	}
 
 	@override
 	Widget build(BuildContext context) {
 		Checkbox box = Checkbox(
- 			value: checkState,
+ 			value: widget.factory.state,
 			onChanged: (bool? value) { 
 				setState(() {
-					checkState = value!;
+					widget.factory.state = value!;
 				});
 			},
 		);
@@ -48,6 +58,9 @@ class _UWCheckState extends State<UWCheck> {
 				hintText: 'Enter a to-do',
 			),
 			controller: _textController,
+			onChanged: (value) {
+			  widget.factory.text = value;
+			},
 		);
 		
 		if (widget.mode == Mode.view) {

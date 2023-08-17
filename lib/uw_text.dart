@@ -6,12 +6,14 @@ import 'panel_page.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
-class UWTextFactory extends UserWidgetFactory {
+class UWTextFactory extends UWFactory<UWText> {
+	String text = "";
+
 	UWTextFactory(Key key) : super(key);
 
 	@override
-	UserWidget build(PanelControllerState page, Mode mode) {
-		return UWText(page, mode, key);
+	UWText build(PanelControllerState page, Mode mode) {
+		return UWText(page, mode, this, key);
 	}
 	
 	@override	
@@ -19,7 +21,9 @@ class UWTextFactory extends UserWidgetFactory {
 }
 
 class UWText extends UserWidget{
-  UWText(super.widgetController, super.mode, Key key) : super(key: key);
+	final UWTextFactory factory;
+
+  UWText(super.widgetController, super.mode, this.factory, Key key) : super(key: key);
 
 	@override
 	State<StatefulWidget> createState() => _UWTextState();
@@ -27,6 +31,12 @@ class UWText extends UserWidget{
 
 class _UWTextState extends State<UWText> {
 	TextEditingController _textController = TextEditingController();
+
+	@override
+	void initState() {
+		_textController.text = widget.factory.text;
+		super.initState();
+	}
 
 	@override
 	Widget build(BuildContext context) {
@@ -41,6 +51,9 @@ class _UWTextState extends State<UWText> {
 			style: TextStyle(fontWeight: FontWeight.bold),
 			minLines: 1,
 			maxLines: 1024,
+			onChanged: (value) {
+			  widget.factory.text = value;
+			},
 		);
 
 		if (widget.mode == Mode.view) {

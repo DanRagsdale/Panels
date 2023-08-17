@@ -21,9 +21,9 @@ class PanelControllerState extends State<PanelController> {
 	late PanelPage widgetPage;
 
 	// These functions update the backend AND force the list to update its display 
-	void add(UserWidgetFactory w) => setState(() => widgetPage.add(w));
-	void insert(int index, UserWidgetFactory w) => setState(() => widgetPage.insert(index, w));
-	void insertAfter(Key k, UserWidgetFactory w) => setState(() => widgetPage.insertAfter(k, w));
+	void add(UWFactory w) => setState(() => widgetPage.add(w));
+	void insert(int index, UWFactory w) => setState(() => widgetPage.insert(index, w));
+	void insertAfter(Key k, UWFactory w) => setState(() => widgetPage.insertAfter(k, w));
 	void remove(Key k) => setState(() => widgetPage.remove(k));
 
 	
@@ -127,9 +127,22 @@ class PanelControllerState extends State<PanelController> {
 							tooltip: "New Divider",
 							onPressed: () => add(UWSeparatorFactory(GlobalKey())),
 						),
+						IconButton(
+							icon: Icon(Icons.more_vert),
+							tooltip: "More Widgets",
+							onPressed: () {},
+						),
 					],
 				),
 			],
 		);
+	}
+	
+	@override
+	void dispose() {
+		//for (int i = 0; i < widgetPage.widgetFactories.length; i++) {
+		//	widgetPage.widgetFactories[i] = widgetPage.widgetFactories[i].save();
+		//}
+		super.dispose();
 	}
 }

@@ -49,10 +49,7 @@ class _FirstPageState extends State<FirstPage> {
 	];
 
 	void refreshCallback() {
-		print("calling back");
-		setState(() {
-		  
-		});
+		setState(() {});
 	}
 
 	@override
