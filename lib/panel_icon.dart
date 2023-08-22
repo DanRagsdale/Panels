@@ -32,8 +32,13 @@ class PanelIcon extends StatelessWidget {
 				),
 				child: Column(
 					children: [
-						Text(initialPage.title, style: TextStyle(fontWeight: FontWeight.bold)),
-						Text(initialPage.getPreview()),
+						Text(
+							initialPage.title,
+							style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
+						Expanded(
+							child: Text(initialPage.getPreview(),
+							),
+						),
 					],
 				),
 			),
