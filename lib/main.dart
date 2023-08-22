@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:panels/panel_page.dart';
+import 'package:panels/panel_data.dart';
 import 'package:panels/uw_check.dart';
 import 'package:panels/uw_separator.dart';
 
-import 'note_icon.dart';
+import 'panel_icon.dart';
 
 const Color COLOR_TEXT = Color(0xff000000);
 //const Color COLOR_MENU_TEXT = Color(0xff2E272D);
@@ -31,21 +31,21 @@ class _MyAppState extends State<MyApp> {
 	Widget build(BuildContext context) {
 		return MaterialApp(
 			//debugShowCheckedModeBanner: false,
-			home: FirstPage(),
+			home: MainPage(),
 		);
 	}
 }
 
-class FirstPage extends StatefulWidget {
+class MainPage extends StatefulWidget {
 	@override
-	State<FirstPage> createState() => _FirstPageState();
+	State<MainPage> createState() => _MainPageState();
 }
 
-class _FirstPageState extends State<FirstPage> {
-	List<PanelPage> panels = [
-		PanelPage("Example", [UWCheckFactory(GlobalKey()), UWSeparatorFactory(GlobalKey())]),
-		PanelPage("Empty 1", []),
-		PanelPage("Empty 2", []),
+class _MainPageState extends State<MainPage> {
+	List<PanelData> panels = [
+		PanelData("Example", [UWCheckFactory(GlobalKey()), UWSeparatorFactory(GlobalKey())]),
+		PanelData("Empty 1", []),
+		PanelData("Empty 2", []),
 	];
 
 	void refreshCallback() {
@@ -70,7 +70,7 @@ class _FirstPageState extends State<FirstPage> {
 					crossAxisSpacing: 10,
 					mainAxisSpacing: 10,
 					crossAxisCount: 2,
-					children: panels.map((e) => NoteIcon(initialPage: e, refreshCallback: refreshCallback,)).toList(),
+					children: panels.map((e) => PanelIcon(initialPage: e, refreshCallback: refreshCallback,)).toList(),
 					//],
 				),
 			),

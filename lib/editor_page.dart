@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:panels/panel_controller.dart';
-import 'package:panels/panel_page.dart';
+import 'package:panels/panel_data.dart';
 
 import 'main.dart';
 
 enum Mode {view, edit}
 
 class EditorPage extends StatefulWidget {
-	final PanelPage initialPage;
+	final PanelData initialPage;
 
 	EditorPage({required this.initialPage, Key? key}) : super(key: key);
 
@@ -17,8 +17,6 @@ class EditorPage extends StatefulWidget {
 
 class _EditorPageState extends State<EditorPage> {
 	TextEditingController _titleController = TextEditingController();
-	
-	int modeIndex = 0;
 	Mode mode = Mode.view;
 
 	@override
@@ -38,15 +36,14 @@ class _EditorPageState extends State<EditorPage> {
 			),
 			body: Container(
 				color: COLOR_BACKGROUND,
-				child: PanelController(initialPage: widget.initialPage, mode: mode),
+				child: PanelVisualizer(initialPage: widget.initialPage, mode: mode),
 			),
 			bottomNavigationBar: BottomNavigationBar(
 				backgroundColor: COLOR_MENU_BG,
 				selectedItemColor: COLOR_MENU_HOT,
 				unselectedItemColor: COLOR_MENU_COLD,
-				currentIndex: modeIndex,
+				currentIndex: mode.index,
 				onTap: (index) {setState(() {
-				  modeIndex = index;
 					mode = index == 0 ? mode = Mode.view : Mode.edit;
 				});},
 				items: [

@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:panels/panel_page.dart';
+import 'package:panels/panel_data.dart';
 
 import 'editor_page.dart';
 import 'uw_separator.dart';
 import 'uw_check.dart';
 import 'uw_text.dart';
 
-class PanelController extends StatefulWidget {
-	final PanelPage initialPage;
+/// The widget that displays a NotePanel in its various configurations
+/// Also serves as a liason between the individual UserWidgets and the PanelData
+class PanelVisualizer extends StatefulWidget {
+	final PanelData initialPage;
 	final Mode mode;
 	
-	PanelController({required this.initialPage, required this.mode});
+	PanelVisualizer({required this.initialPage, required this.mode});
 
 	@override
-	State<StatefulWidget> createState() => PanelControllerState();
+	State<StatefulWidget> createState() => PanelVisualizerState();
 }
 
-// Controller for the procedural list of user widgets
-class PanelControllerState extends State<PanelController> {
-	late PanelPage widgetPage;
+class PanelVisualizerState extends State<PanelVisualizer> {
+	late PanelData widgetPage;
 
 	// These functions update the backend AND force the list to update its display 
 	void add(UWFactory w) => setState(() => widgetPage.add(w));
@@ -110,29 +111,36 @@ class PanelControllerState extends State<PanelController> {
 					child: moveableList,
 				),
 				Row(
-					mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-					children: [
-						IconButton(
-							icon: Icon(Icons.wysiwyg),
-							tooltip: "New Text Box",
-							onPressed: () => add(UWTextFactory(GlobalKey())),
+					mainAxisAlignment: MainAxisAlignment.spaceBetween,
+				  children: [
+				    Expanded(
+							child: Row(
+								mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+								children: [
+									IconButton(
+										icon: Icon(Icons.wysiwyg),
+										tooltip: "New Text Box",
+										onPressed: () => add(UWTextFactory(GlobalKey())),
+									),
+									IconButton(
+										icon: Icon(Icons.checklist),
+										tooltip: "New Check Box",
+										onPressed: () => add(UWCheckFactory(GlobalKey())),
+									),
+									IconButton(
+										icon: Icon(Icons.horizontal_rule),
+										tooltip: "New Divider",
+										onPressed: () => add(UWSeparatorFactory(GlobalKey())),
+									),
+								],
+							),
 						),
-						IconButton(
-							icon: Icon(Icons.checklist),
-							tooltip: "New Check Box",
-							onPressed: () => add(UWCheckFactory(GlobalKey())),
-						),
-						IconButton(
-							icon: Icon(Icons.horizontal_rule),
-							tooltip: "New Divider",
-							onPressed: () => add(UWSeparatorFactory(GlobalKey())),
-						),
-						IconButton(
-							icon: Icon(Icons.more_vert),
-							tooltip: "More Widgets",
-							onPressed: () {},
-						),
-					],
+				    IconButton(
+				    	icon: Icon(Icons.more_vert),
+				    	tooltip: "More Widgets",
+				    	onPressed: () {},
+				    ),
+				  ],
 				),
 			],
 		);
@@ -140,9 +148,6 @@ class PanelControllerState extends State<PanelController> {
 	
 	@override
 	void dispose() {
-		//for (int i = 0; i < widgetPage.widgetFactories.length; i++) {
-		//	widgetPage.widgetFactories[i] = widgetPage.widgetFactories[i].save();
-		//}
 		super.dispose();
 	}
 }

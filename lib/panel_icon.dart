@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:panels/main.dart';
-import 'package:panels/panel_page.dart';
+import 'package:panels/panel_data.dart';
 
 import 'editor_page.dart';
 
-class NoteIcon extends StatelessWidget {
-	final PanelPage initialPage;
+/// The widget that represents a specifc NotePanel on the main page
+class PanelIcon extends StatelessWidget {
+	final PanelData initialPage;
 	final void Function() refreshCallback;
 	
-	NoteIcon({required this.initialPage, required this.refreshCallback});
+	PanelIcon({required this.initialPage, required this.refreshCallback});
 
 	@override
 	Widget build(BuildContext context) {

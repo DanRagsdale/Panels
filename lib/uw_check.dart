@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:panels/panel_controller.dart';
 import 'package:panels/user_widget.dart';
 
-import 'panel_page.dart';
+import 'panel_data.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
@@ -13,7 +13,7 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 	UWCheckFactory(Key key) : super(key);
 
 	@override
-	UWCheck build(PanelControllerState page, Mode mode) {
+	UWCheck build(PanelVisualizerState page, Mode mode) {
 		return UWCheck(page, mode, this, key);
 	}
 
