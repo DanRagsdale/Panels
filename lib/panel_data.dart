@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:panels/panel_controller.dart';
+import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
 import 'editor_page.dart';
@@ -13,6 +13,10 @@ abstract class UWFactory<T extends UserWidget> {
 	UWFactory(this.key);
 
 	T build(PanelVisualizerState page, Mode mode);
+
+	/// Receive a WidgetMessage
+	/// Return true if the message should continue propagating
+	bool receiveMessage(WidgetMessage message) => false;
 
 	String previewString();
 }

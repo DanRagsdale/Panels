@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panels/panel_data.dart';
+import 'package:panels/uw_check_controller.dart';
 
 import 'editor_page.dart';
 import 'uw_separator.dart';
@@ -24,10 +25,11 @@ class PanelVisualizer extends StatefulWidget {
 enum WidgetButtons {
 	text(icon: Icons.wysiwyg, description: "Text Box", factory: UWTextFactory.new),
 	check(icon: Icons.checklist, description: "Check Box", factory: UWCheckFactory.new),
+	image(icon: Icons.image_outlined, description: "Image", factory: UWCheckFactory.new), // TODO create factory
 	separator(icon: Icons.horizontal_rule, description: "Divider", factory: UWSeparatorFactory.new),
 
-	checkController(icon: Icons.clear_all_outlined, description: "Check Controller", factory: UWCheckFactory.new),
-	form(icon: Icons.view_list_outlined, description: "Form", factory: UWTextFactory.new);
+	checkController(icon: Icons.clear_all_outlined, description: "Check Controller", factory: UWCheckControllerFactory.new),
+	form(icon: Icons.view_list_outlined, description: "Form", factory: UWTextFactory.new); // TODO create factory
 
 	const WidgetButtons({
 		required this.icon,
@@ -65,6 +67,10 @@ enum WidgetButtons {
 	}
 }
 
+/// Abstract class used for passing messages between UserWidgets
+abstract class WidgetMessage {
+}
+
 class PanelVisualizerState extends State<PanelVisualizer> {
 	late PanelData widgetPage;
 
@@ -74,7 +80,25 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 	void insertAfter(Key k, UWFactory w) => setState(() => widgetPage.insertAfter(k, w));
 	void remove(Key k) => setState(() => widgetPage.remove(k));
 
+	/// Sends the message to every single widget factory,
+	/// including the one which sends the message
+	void broadcastMessage(WidgetMessage message) {
+		for (var w in widgetPage.widgetFactories) {
+			w.receiveMessage(message);
+		}
+		setState(() {});
+	}
 	
+	/// Send the message to every widget factory after initial, until
+	/// receive message returns false
+	void propagateMessage(UWFactory initial, WidgetMessage message) {
+		int index = widgetPage.widgetFactories.indexOf(initial);
+
+		if (index != -1) {
+			while (++index < widgetPage.widgetFactories.length && widgetPage.widgetFactories[index].receiveMessage(message));
+			setState(() {});
+		}
+	}
 	
 	// Flutter code
 	@override
@@ -166,6 +190,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 								children: [
 									WidgetButtons.text.getIconButton(add),
 									WidgetButtons.check.getIconButton(add),
+									WidgetButtons.image.getIconButton(add),
 									WidgetButtons.separator.getIconButton(add),
 								],
 							),

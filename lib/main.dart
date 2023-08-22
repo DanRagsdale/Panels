@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:panels/panel_data.dart';
 import 'package:panels/uw_check.dart';
+import 'package:panels/uw_check_controller.dart';
 import 'package:panels/uw_separator.dart';
 
 import 'panel_icon.dart';
@@ -43,7 +44,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 	List<PanelData> panels = [
-		PanelData("Example", [UWCheckFactory(GlobalKey()), UWSeparatorFactory(GlobalKey())]),
+		PanelData("Example", [UWCheckControllerFactory(GlobalKey()), UWCheckFactory(GlobalKey()), UWSeparatorFactory(GlobalKey())]),
 		PanelData("Empty 1", []),
 		PanelData("Empty 2", []),
 	];

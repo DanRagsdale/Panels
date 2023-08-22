@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:panels/panel_controller.dart';
+import 'package:panels/panel_visualizer.dart';
 
 import 'editor_page.dart';
 

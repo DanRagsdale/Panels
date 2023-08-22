@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:panels/panel_controller.dart';
+import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
+import 'package:panels/uw_check_controller.dart';
 
 import 'panel_data.dart';
 import 'main.dart';
@@ -20,6 +21,15 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 	@override	
 	String previewString() {
 		return "Checkbox";
+	}
+
+	@override
+	bool receiveMessage(WidgetMessage message) {
+		if (message is MessageUncheck) {
+			state = false;
+			return true;
+		}
+		return false;
 	}
 }
 
