@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panels/panel_data.dart';
 
@@ -16,6 +17,52 @@ class PanelVisualizer extends StatefulWidget {
 
 	@override
 	State<StatefulWidget> createState() => PanelVisualizerState();
+}
+
+/// Enum that is used for organizing and generating all of the buttons the user
+/// may use to add widgets in edit mode
+enum WidgetButtons {
+	text(icon: Icons.wysiwyg, description: "Text Box", factory: UWTextFactory.new),
+	check(icon: Icons.checklist, description: "Check Box", factory: UWCheckFactory.new),
+	separator(icon: Icons.horizontal_rule, description: "Divider", factory: UWSeparatorFactory.new),
+
+	checkController(icon: Icons.clear_all_outlined, description: "Check Controller", factory: UWCheckFactory.new),
+	form(icon: Icons.view_list_outlined, description: "Form", factory: UWTextFactory.new);
+
+	const WidgetButtons({
+		required this.icon,
+		required this.description,
+		required this.factory,
+	});
+
+	final IconData icon;
+	final String description;
+	final UWFactory Function(GlobalKey) factory;
+
+
+	IconButton getIconButton(Function(UWFactory) addFunc) {
+		return IconButton(
+			icon: Icon(icon),
+			tooltip: description,
+			onPressed: () => addFunc(factory(GlobalKey())),
+		);
+	}
+
+	PopupMenuItem getMenuItem(Function(UWFactory) addFunc) {
+		return PopupMenuItem( 
+			value: this.index,
+			onTap: () => addFunc(factory(GlobalKey())),
+			child: Row(
+				children: [
+					Icon(icon),
+					SizedBox(
+						width: 10,
+					),
+					Text(description)
+				],
+			),
+		);
+	}
 }
 
 class PanelVisualizerState extends State<PanelVisualizer> {
@@ -104,7 +151,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 				},
 				children: reorderableChildren,
 		);
-	
+
 		return Column(
 			children: [
 				Expanded(
@@ -112,35 +159,31 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 				),
 				Row(
 					mainAxisAlignment: MainAxisAlignment.spaceBetween,
-				  children: [
-				    Expanded(
+					children: [
+						Expanded(
 							child: Row(
 								mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 								children: [
-									IconButton(
-										icon: Icon(Icons.wysiwyg),
-										tooltip: "New Text Box",
-										onPressed: () => add(UWTextFactory(GlobalKey())),
-									),
-									IconButton(
-										icon: Icon(Icons.checklist),
-										tooltip: "New Check Box",
-										onPressed: () => add(UWCheckFactory(GlobalKey())),
-									),
-									IconButton(
-										icon: Icon(Icons.horizontal_rule),
-										tooltip: "New Divider",
-										onPressed: () => add(UWSeparatorFactory(GlobalKey())),
-									),
+									WidgetButtons.text.getIconButton(add),
+									WidgetButtons.check.getIconButton(add),
+									WidgetButtons.separator.getIconButton(add),
 								],
 							),
 						),
-				    IconButton(
-				    	icon: Icon(Icons.more_vert),
-				    	tooltip: "More Widgets",
-				    	onPressed: () {},
-				    ),
-				  ],
+						PopupMenuButton(
+							icon: Icon(Icons.more_vert),
+							tooltip: "More Widgets",
+							offset: Offset(0.0, -120.0),
+
+							itemBuilder: (context) => [
+								WidgetButtons.checkController.getMenuItem(add),
+								WidgetButtons.form.getMenuItem(add),
+							],
+							//onSelected: (index) {
+							//	add(WidgetButtons.getFactoryByIndex(index));
+							//},
+						),
+					],
 				),
 			],
 		);
