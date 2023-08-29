@@ -7,6 +7,7 @@ import 'editor_page.dart';
 import 'uw_separator.dart';
 import 'uw_check.dart';
 import 'uw_text.dart';
+import 'user_widget.dart';
 
 /// The widget that displays a NotePanel in its various configurations
 /// Also serves as a liason between the individual UserWidgets and the PanelData
@@ -67,10 +68,6 @@ enum WidgetButtons {
 	}
 }
 
-/// Abstract class used for passing messages between UserWidgets
-abstract class WidgetMessage {
-}
-
 class PanelVisualizerState extends State<PanelVisualizer> {
 	late PanelData widgetPage;
 
@@ -95,7 +92,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 		int index = widgetPage.widgetFactories.indexOf(initial);
 
 		if (index != -1) {
-			while (++index < widgetPage.widgetFactories.length && widgetPage.widgetFactories[index].receiveMessage(message));
+			while (++index < widgetPage.length && widgetPage.widgetFactories[index].receiveMessage(message));
 			setState(() {});
 		}
 	}
@@ -158,22 +155,22 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 		//}
 
 		var moveableList = ReorderableListView(
-				//buildDefaultDragHandles: false,
-				onReorderStart: (index) {
-					// Needed to prevent freezing when the items are moved
-					FocusManager.instance.primaryFocus?.unfocus();
-				},
-				onReorder: (int oldIndex, int newIndex) {
-					setState(() { 
-						if (oldIndex < newIndex) {
-							// removing the item at oldIndex will shorten the list by 1.
-							newIndex -= 1;
-						}
-						var movedItem = widgetPage.removeAt(oldIndex);
-						widgetPage.insert(newIndex, movedItem);
-					});  
-				},
-				children: reorderableChildren,
+			//buildDefaultDragHandles: false,
+			onReorderStart: (index) {
+				// Needed to prevent freezing when the items are moved
+				FocusManager.instance.primaryFocus?.unfocus();
+			},
+			onReorder: (int oldIndex, int newIndex) {
+				setState(() { 
+					if (oldIndex < newIndex) {
+						// removing the item at oldIndex will shorten the list by 1.
+						newIndex -= 1;
+					}
+					var movedItem = widgetPage.removeAt(oldIndex);
+					widgetPage.insert(newIndex, movedItem);
+				});  
+			},
+			children: reorderableChildren,
 		);
 
 		return Column(

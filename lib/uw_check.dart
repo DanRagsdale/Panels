@@ -3,7 +3,6 @@ import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 import 'package:panels/uw_check_controller.dart';
 
-import 'panel_data.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
@@ -54,6 +53,7 @@ class _UWCheckState extends State<UWCheck> {
 	@override
 	Widget build(BuildContext context) {
 		Checkbox box = Checkbox(
+			fillColor: MaterialStateColor.resolveWith((states) => COLOR_MENU_COLD),
  			value: widget.factory.state,
 			onChanged: (bool? value) { 
 				setState(() {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
-import 'panel_data.dart';
 import 'editor_page.dart';
 
 class UWSeparatorFactory extends UWFactory<UWSeparator> {

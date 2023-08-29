@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
-import 'panel_data.dart';
 import 'main.dart';
 import 'editor_page.dart';
 
@@ -46,6 +45,9 @@ class _UWCheckControllerState extends State<UWCheckController> {
 	@override
 	Widget build(BuildContext context) {
 		var button = ElevatedButton(
+			style: ButtonStyle(
+				backgroundColor: MaterialStateColor.resolveWith((states) => COLOR_MENU_COLD),
+			),
  			child: Text("Uncheck Completed"),
 			onPressed: () {
 				if (widget.factory.controlMode == ControlMode.all) {

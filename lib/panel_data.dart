@@ -4,23 +4,6 @@ import 'package:panels/user_widget.dart';
 
 import 'editor_page.dart';
 
-/// The backend data structure used to represent a single UserWidget within a NotePanel
-/// Stores all persistent information associated with a UserWidget,
-/// and can generate the corresponding flutter widget when needed
-/// Will be subclassed by each specific UserWidget
-abstract class UWFactory<T extends UserWidget> {
-	final Key key;
-	UWFactory(this.key);
-
-	T build(PanelVisualizerState page, Mode mode);
-
-	/// Receive a WidgetMessage
-	/// Return true if the message should continue propagating
-	bool receiveMessage(WidgetMessage message) => false;
-
-	String previewString();
-}
-
 /// The backend data structure used to represent and manipulate a NotePanel
 class PanelData {
 	String title;
@@ -38,6 +21,8 @@ class PanelData {
 	}
 
 	// Widget list methods
+	int get length => widgetFactories.length;
+
 	void add(UWFactory w) => widgetFactories.add(w);
 	void insert(int index, UWFactory w) => widgetFactories.insert(index, w);
 
@@ -57,6 +42,8 @@ class PanelData {
 		return widgetFactories.removeAt(index);
 	}
 
+	/// The primary build function used to convert the data structure into
+	/// a list of displable widgets
 	List<UserWidget> buildWidgetList(PanelVisualizerState controller, Mode mode) {
 		List<UserWidget> outputList = [];
 
