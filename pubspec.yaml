@@ -39,6 +39,8 @@ dependencies:
   # Drag and drop lists
   drag_and_drop_lists: ^0.3.3
 
+  path_provider: ^2.1.0
+
 
 dev_dependencies:
   flutter_test:

@@ -20,6 +20,16 @@ class _EditorPageState extends State<EditorPage> {
 	Mode mode = Mode.view;
 
 	@override
+	void initState() {
+		super.initState();
+		widget.initialPage.readFile().then((value) {
+			setState(() {
+				_titleController.text = value;
+			});
+		});
+	}
+
+	@override
 	Widget build(BuildContext context) {
 		_titleController.text = widget.initialPage.title;
 
@@ -56,6 +66,7 @@ class _EditorPageState extends State<EditorPage> {
 
 	@override
 	void dispose() {
+		widget.initialPage.saveFile();
 		_titleController.dispose();
 		super.dispose();
 	}

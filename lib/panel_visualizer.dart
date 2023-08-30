@@ -115,45 +115,6 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 		}
 
 		// Edit Mode display
-		// Not yet sure which implementation of a reorderable list works better
-		// The DragAndDropLists seem more stable, but have some weird behavior
-		// DragAndDropLists throw GlobalKeyExceptions, which is annoying
-		// ReorderableList occasionally freezes, seemingly at random
-
-		//List<DragAndDropList> _contents = [
-		//	DragAndDropList(
-		//		children: widgetPage.buildWidgetList(this, Mode.edit).map((e) => DragAndDropItem(child: e)).toList(),
-		//	),
-		//];
-
-		//var moveableList = DragAndDropLists(
-		//		removeTopPadding: true,
-		//		itemDragOnLongPress: false,
-		//		onItemReorder: (int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-		//			setState(() {
-		//				var movedItem = widgetPage.removeAt(oldItemIndex);
-		//				insert(newItemIndex, movedItem);
-		//			});
-		//		},
-		//		onListReorder: (int oldListIndex, int newListIndex) {  },
-		//		children: _contents,
-		//);
-
-		var reorderableChildren = widgetPage.buildWidgetList(this, Mode.edit);
-		//List<Widget> reorderableChildren = [];
-		//var widgetList = widgetPage.buildWidgetList(this, Mode.edit);
-		//for (int i = 0; i < widgetList.length; i++) {
-		//	reorderableChildren.add(
-		//		ReorderableDragStartListener(
-		//			key: Key("List-" + i.toString()),
-		//			index: i,
-		//			child: InkWell(
-		//				child: widgetList[i]
-		//			),
-		//		),
-		//	);
-		//}
-
 		var moveableList = ReorderableListView(
 			//buildDefaultDragHandles: false,
 			onReorderStart: (index) {
@@ -170,7 +131,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 					widgetPage.insert(newIndex, movedItem);
 				});  
 			},
-			children: reorderableChildren,
+			children: widgetPage.buildWidgetList(this, Mode.edit),
 		);
 
 		return Column(
