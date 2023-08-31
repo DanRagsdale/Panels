@@ -22,9 +22,10 @@ class _EditorPageState extends State<EditorPage> {
 	@override
 	void initState() {
 		super.initState();
-		widget.initialPage.readFile().then((value) {
+		//TODO prevent wasting time reloading if the page is already cached
+		widget.initialPage.readFile().then((_) {
 			setState(() {
-				_titleController.text = value;
+				_titleController.text = widget.initialPage.title;
 			});
 		});
 	}

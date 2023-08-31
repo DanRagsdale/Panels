@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:panels/main.dart';
 
+import 'main_menu_data.dart';
+
 /// The widget that represents a specifc NotePanel on the main page
 class PanelIcon extends StatelessWidget {
-	final PanelMenuContainer panelMenu;
+	final PanelIconData panelMenu;
 	
 	PanelIcon({required this.panelMenu});
 
@@ -41,8 +43,10 @@ class PanelIcon extends StatelessWidget {
 				Positioned.fill(child: note_icon,),
 				Checkbox(
 					shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+					fillColor: MaterialStateColor.resolveWith((states) => COLOR_MENU_COLD),
+
 					value: panelMenu.mode == LocalSelectionMode.selected,
-					onChanged: (_) {},
+					onChanged: null,
 				),
 			],
 		);

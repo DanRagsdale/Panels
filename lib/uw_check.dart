@@ -30,6 +30,22 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 		}
 		return false;
 	}
+	
+	@override
+	Map toJsonMap() {
+		return {
+			'id' : 'check',
+
+			'state' : state,
+			'body' : text,
+		};
+	}
+
+	@override
+	void buildFromJsonMap(Map m) {
+		state = m['state'];
+		text = m['body'];
+	}
 }
 
 class UWCheck extends UserWidget {

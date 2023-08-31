@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -15,14 +16,60 @@ class PanelData {
 
 	PanelData._(this.title, this.widgetFactories, this.file);
 
-	static Future<PanelData> fromFile(File file) async {
+	static Future<PanelData> newWithFile(File file) async {
 		try {
-			final title = await file.readAsString();
-			return PanelData._(title, [], file);
+			PanelData pd = PanelData._("Json Title!", [], file);
+			pd.saveFile();
+			return pd;
 		} catch (e) {
 			return PanelData._("Error!", [], file);
 		}
 	}
+
+	static Future<PanelData> fromFile(File file) async {
+		try {
+			PanelData pd = PanelData._("temp", [], file);
+			await pd.readFile();
+
+			return pd;
+		} catch (e) {
+			return PanelData._("Error!", [], file);
+		}
+	}
+	
+	// Serialization methods
+	Future<void> readFile() async {
+		try {
+			// Read the file
+			final rawContents = await file.readAsString();
+			final contents = jsonDecode(rawContents);
+			
+			title = contents["title"];
+			widgetFactories = [];
+
+			var widgetJson = contents["widgets"];
+
+			for (var w in widgetJson) {
+				UWFactory fac = UWFactory.fromJsonMap(w);
+				widgetFactories.add(fac);
+			}
+		} catch (e) {
+		}
+	}
+	
+	Future<File> saveFile() async {
+		var widgetMaps = [];
+		for (var w in widgetFactories) {
+			widgetMaps.add(w.toJsonMap());
+		}
+		// Write the file
+		var output = jsonEncode({
+			"title" : title,
+			"widgets" : widgetMaps,
+		});
+		return file.writeAsString(output);
+	}
+
 
 	String getPreview() {
 		String output = "";
@@ -53,25 +100,6 @@ class PanelData {
 	
 	UWFactory removeAt(int index) {
 		return widgetFactories.removeAt(index);
-	}
-
-	// Serialization methods
-	Future<String> readFile() async {
-		try {
-			// Read the file
-			final contents = await file.readAsString();
-			title = contents;
-
-			return contents;
-		} catch (e) {
-			// If encountering an error, return 0
-			return "New file";
-		}
-	}
-	
-	Future<File> saveFile() async {
-		// Write the file
-		return file.writeAsString(title);
 	}
 
 	/// The primary build function used to convert the data structure into

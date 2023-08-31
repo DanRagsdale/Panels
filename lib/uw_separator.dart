@@ -14,6 +14,16 @@ class UWSeparatorFactory extends UWFactory<UWSeparator> {
 	
 	@override	
 	String previewString() => "Separator";
+	
+	@override
+	Map toJsonMap() {
+		return {
+			'id' : 'separator'
+		};
+	}
+
+	@override
+	void buildFromJsonMap(Map m) {}
 }
 
 class UWSeparator extends UserWidget{

@@ -17,6 +17,19 @@ class UWTextFactory extends UWFactory<UWText> {
 	
 	@override	
 	String previewString() => "Text Box";
+	
+	@override
+	Map toJsonMap() {
+		return {
+			'id' : 'text',
+			'body' : text,
+		};
+	}
+
+	@override
+	void buildFromJsonMap(Map m) {
+		text = m['body'];
+	}
 }
 
 class UWText extends UserWidget{

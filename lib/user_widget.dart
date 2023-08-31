@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:panels/panel_visualizer.dart';
+import 'package:panels/uw_check.dart';
+import 'package:panels/uw_check_controller.dart';
+import 'package:panels/uw_separator.dart';
+import 'package:panels/uw_text.dart';
 
 import 'editor_page.dart';
 
@@ -18,6 +22,25 @@ abstract class UWFactory<T extends UserWidget> {
 	bool receiveMessage(WidgetMessage message) => false;
 
 	String previewString();
+
+	static Map factoryNames = {
+		'text' : UWTextFactory.new,
+		'separator' : UWSeparatorFactory.new,
+		'check' :UWCheckFactory.new,
+		'check_controller' : UWCheckControllerFactory.new,
+	};
+
+	Map toJsonMap();
+	void buildFromJsonMap(Map m);
+
+	static UWFactory fromJsonMap(Map m) {
+		String id = m['id'];
+		UWFactory obj = factoryNames[id](GlobalKey());
+
+		obj.buildFromJsonMap(m);
+
+		return obj;
+	}
 }
 
 /// Widget class for user editable widgets

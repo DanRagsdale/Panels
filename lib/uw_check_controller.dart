@@ -30,6 +30,19 @@ class UWCheckControllerFactory extends UWFactory<UWCheckController> {
 	String previewString() {
 		return "Check Controller";
 	}
+
+	@override
+	Map toJsonMap() {
+		return {
+			'id' : 'check_controller',
+			'all' : controlMode == ControlMode.all,
+		};
+	}
+
+	@override
+	void buildFromJsonMap(Map m) {
+		controlMode = m['all'] ? ControlMode.all : ControlMode.connected;
+	}
 }
 
 class UWCheckController extends UserWidget {

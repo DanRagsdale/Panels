@@ -8,6 +8,7 @@ import 'package:panels/panel_data.dart';
 
 import 'panel_icon.dart';
 import 'editor_page.dart';
+import 'main_menu_data.dart';
 
 const Color COLOR_TEXT = Color(0xff000000);
 //const Color COLOR_MENU_TEXT = Color(0xff2E272D);
@@ -45,148 +46,8 @@ class MainPage extends StatefulWidget {
 	State<MainPage> createState() => _MainPageState();
 }
 
-enum LocalSelectionMode {
-	unselected,
-	ready,
-	selected,
-}
-
-enum GlobalSelectionMode {
-	view(defaultLocalMode: LocalSelectionMode.unselected),
-	selection(defaultLocalMode: LocalSelectionMode.ready);
-
-	const GlobalSelectionMode({
-		required this.defaultLocalMode,
-	});
-
-	final LocalSelectionMode defaultLocalMode;
-}
-
-class PanelMenuContainer {
-	PanelData panel;
-	LocalSelectionMode mode;
-
-	PanelMenuContainer(this.panel, this.mode);
-}
-
-class SelectionMenuData {
-	List<PanelData> panels = [];
-	GlobalSelectionMode mode = GlobalSelectionMode.view;
-	Set<int> selections = {};
-
-	void add(PanelData pd) {
-		panels.add(pd);
-	}
-
-	/// Remove every selected PanelData
-	/// DOES NOT delete the underlying files. This must be handled separately
-	List<PanelData> RemoveSelected() {
-		List<PanelData> removals = [];
-		for (var i in selections) {
-			removals.add(panels[i]);
-		}
-		for (var pd in removals) {
-			panels.remove(pd);
-		}
-		deselectAll();
-		return removals;
-	}
-
-	int get length => panels.length;
-	
-	operator [](int i) => panels[i]; // get
-	//PanelData getPanel(int index) {
-	//	return panels[index];
-	//}
-
-	PanelMenuContainer getMenuContainer(int index) {
-		if (selections.contains(index)) {
-			return PanelMenuContainer(panels[index], LocalSelectionMode.selected);
-		}
-		return PanelMenuContainer(panels[index], mode.defaultLocalMode);
-	}
-
-	void select(int index) {
-		mode = GlobalSelectionMode.selection;
-		selections.add(index);
-		//panels[index].mode = LocalSelectionMode.ready;
-	}
-	
-	void toggleSelection(int index) {
-		mode = GlobalSelectionMode.selection;
-		bool flag = selections.add(index);
-		if (!flag) {
-			selections.remove(index);
-		}
-
-	}
-
-	void selectAll() {
-		mode = GlobalSelectionMode.selection;
-		selections.addAll(Iterable<int>.generate(length));
-	}
-
-	void deselectAll() {
-		mode = GlobalSelectionMode.view;
-		selections = {};
-	}
-}
-
 class _MainPageState extends State<MainPage> {
 	SelectionMenuData menuData = SelectionMenuData();
-
-	// TODO refactor the path handling system
-	Future<String> get _localPath async {
-		final directory = await getApplicationDocumentsDirectory();
-
-		return directory.path;
-	}
-
-	Future<Directory> _getLocalDir() async {
-		final path = await _localPath;
-		return Directory('$path/note_panels').create(recursive: true);
-	}
-
-	Future<void> readFiles() async {
-		try {
-			final dir = await _getLocalDir();
-			final entities = await dir.list().toList();
-			final Iterable<File> files = entities.whereType<File>();
-
-			for (var f in files) {
-				PanelData.fromFile(f).then((pd) {
-					setState(() {
-						menuData.add(pd);
-					});
-				});
-			}
-
-			print(dir.path);
-			//final contents = await file.readAsString();
-		} catch (e) {}
-	}
-
-	Future<void> newFile() async {
-		final path = await _localPath;
-		final name = "panel" + DateTime.now().millisecondsSinceEpoch.toString() + ".json";
-		final filename = '$path/note_panels/$name';
-		var file =  await File(filename).writeAsString('New Note Panel');
-		PanelData.fromFile(file).then((pd) {
-			setState(() {
-				menuData.add(pd);
-			});
-		});
-	}
-
-	Future<void> deleteSelected() async {
-		var removed = menuData.RemoveSelected();
-		for (var pd in removed) {
-			try {
-				await pd.file.delete();
-			} catch (e) {}
-		}
-	}
-
 
 	@override
 	void initState() {
@@ -196,6 +57,24 @@ class _MainPageState extends State<MainPage> {
 
 	@override
 	Widget build(BuildContext context) {
+		// TODO add trash can and undo functions when deleting
+	
+		//var snackBar = SnackBar(
+		//	padding: EdgeInsets.only(left: 8.0, right: 8.0),
+		//	content: Row(
+		//		children: [
+		//			Text("Items moved to trash"),
+		//			Spacer(),
+		//			TextButton(
+		//				child: Text("Undo"),
+		//				onPressed: () {
+		//				},
+		//			),
+		//		],
+		//	),
+		//);
+
+		// Top toolbar widget
 		late Widget topBar;
 		if (menuData.mode == GlobalSelectionMode.view) {
 			topBar = const Text("Panels");
@@ -215,6 +94,9 @@ class _MainPageState extends State<MainPage> {
 						icon: Icon(Icons.delete),
 						onPressed: () {
 							deleteSelected().then((value) {
+								//ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then(
+								//	(value) {}
+								//);
 								setState(() {});
 							});
 						})
@@ -252,13 +134,13 @@ class _MainPageState extends State<MainPage> {
 									).then((value) => setState(() {}));
 								} else {
 									setState(() {
-									  menuData.toggleSelection(index);
+										menuData.toggleSelection(index);
 									});
 								}
 							},
 							onLongPress: () {
 								setState(() {
-								  menuData.select(index);
+									menuData.select(index);
 								});
 							},
 							child: PanelIcon(panelMenu: menuData.getMenuContainer(index)),
@@ -273,7 +155,7 @@ class _MainPageState extends State<MainPage> {
 						icon: const Icon(Icons.note_add),
 						tooltip: 'New Note',
 						onPressed: () {
-							newFile();
+							newNote();
 						},
 					),
 					IconButton(
@@ -291,4 +173,54 @@ class _MainPageState extends State<MainPage> {
 			),
 		);
 	}
+
+	// IO functions
+	Future<String> get _localPath async {
+		final directory = await getApplicationDocumentsDirectory();
+		return directory.path;
+	}
+
+	Future<Directory> _getLocalDir() async {
+		final path = await _localPath;
+		return Directory('$path/note_panels').create(recursive: true);
+	}
+
+	Future<void> readFiles() async {
+		try {
+			final dir = await _getLocalDir();
+			final entities = await dir.list().toList();
+			final Iterable<File> files = entities.whereType<File>();
+
+			for (var f in files) {
+				PanelData.fromFile(f).then((pd) {
+					setState(() {
+						menuData.add(pd);
+					});
+				});
+			}
+		} catch (e) {}
+	}
+
+	Future<void> newNote() async {
+		final path = await _localPath;
+		final name = "panel" + DateTime.now().millisecondsSinceEpoch.toString() + ".json";
+		final filename = '$path/note_panels/$name';
+		var file =  await File(filename);
+		PanelData.newWithFile(file).then((pd) {
+			setState(() {
+				menuData.add(pd);
+			});
+		});
+	}
+
+	/// Delete all of the currently selected notes
+	Future<void> deleteSelected() async {
+		var removed = menuData.removeSelected();
+		for (var pd in removed) {
+			try {
+				await pd.file.delete();
+			} catch (e) {}
+		}
+	}
+
 }
