@@ -5,6 +5,8 @@ import 'package:panels/user_widget.dart';
 import 'editor_page.dart';
 
 class UWSeparatorFactory extends UWFactory<UWSeparator> {
+	static final String id = 'separator';
+
 	UWSeparatorFactory(Key key) : super(key);
 
 	@override
@@ -13,12 +15,12 @@ class UWSeparatorFactory extends UWFactory<UWSeparator> {
 	}
 	
 	@override	
-	String previewString() => "Separator";
+	String previewString() => "⸺⸺⸺⸺⸺⸺⸺";
 	
 	@override
 	Map toJsonMap() {
 		return {
-			'id' : 'separator'
+			'id' : id,
 		};
 	}
 

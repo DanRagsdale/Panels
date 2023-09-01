@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panels/panel_data.dart';
 import 'package:panels/uw_check_controller.dart';

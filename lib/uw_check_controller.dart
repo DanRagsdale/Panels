@@ -17,6 +17,8 @@ enum ControlMode {
 }
 
 class UWCheckControllerFactory extends UWFactory<UWCheckController> {
+	static final String id = 'check_controller';
+
 	UWCheckControllerFactory(Key key) : super(key);
 
 	ControlMode controlMode = ControlMode.all;
@@ -28,13 +30,13 @@ class UWCheckControllerFactory extends UWFactory<UWCheckController> {
 
 	@override	
 	String previewString() {
-		return "Check Controller";
+		return "";
 	}
 
 	@override
 	Map toJsonMap() {
 		return {
-			'id' : 'check_controller',
+			'id' : id,
 			'all' : controlMode == ControlMode.all,
 		};
 	}

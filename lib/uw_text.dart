@@ -6,6 +6,8 @@ import 'main.dart';
 import 'editor_page.dart';
 
 class UWTextFactory extends UWFactory<UWText> {
+	static final String id = 'text';
+
 	String text = "";
 
 	UWTextFactory(Key key) : super(key);
@@ -16,12 +18,12 @@ class UWTextFactory extends UWFactory<UWText> {
 	}
 	
 	@override	
-	String previewString() => "Text Box";
+	String previewString() => text;
 	
 	@override
 	Map toJsonMap() {
 		return {
-			'id' : 'text',
+			'id' : id,
 			'body' : text,
 		};
 	}

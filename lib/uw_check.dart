@@ -7,6 +7,8 @@ import 'main.dart';
 import 'editor_page.dart';
 
 class UWCheckFactory extends UWFactory<UWCheck> {
+	static final String id = 'check';
+
 	bool state = false;
 	String text = "";
 	
@@ -19,7 +21,8 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 
 	@override	
 	String previewString() {
-		return "Checkbox";
+		var boxSymbol = state ? '☑' : '☐';
+		return "$boxSymbol-$text";
 	}
 
 	@override
@@ -34,7 +37,7 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 	@override
 	Map toJsonMap() {
 		return {
-			'id' : 'check',
+			'id' : id,
 
 			'state' : state,
 			'body' : text,

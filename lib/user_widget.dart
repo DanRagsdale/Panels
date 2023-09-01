@@ -23,11 +23,13 @@ abstract class UWFactory<T extends UserWidget> {
 
 	String previewString();
 
-	static Map factoryNames = {
-		'text' : UWTextFactory.new,
-		'separator' : UWSeparatorFactory.new,
-		'check' :UWCheckFactory.new,
-		'check_controller' : UWCheckControllerFactory.new,
+
+	// Serialization code
+	static Map idToFactory = {
+		UWTextFactory.id : UWTextFactory.new,
+		UWSeparatorFactory.id : UWSeparatorFactory.new,
+		UWCheckFactory.id : UWCheckFactory.new,
+		UWCheckControllerFactory.id : UWCheckControllerFactory.new,
 	};
 
 	Map toJsonMap();
@@ -35,7 +37,7 @@ abstract class UWFactory<T extends UserWidget> {
 
 	static UWFactory fromJsonMap(Map m) {
 		String id = m['id'];
-		UWFactory obj = factoryNames[id](GlobalKey());
+		UWFactory obj = idToFactory[id](GlobalKey());
 
 		obj.buildFromJsonMap(m);
 

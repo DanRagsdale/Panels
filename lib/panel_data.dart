@@ -70,16 +70,6 @@ class PanelData {
 		return file.writeAsString(output);
 	}
 
-
-	String getPreview() {
-		String output = "";
-		for (var w in widgetFactories) {
-			output += w.previewString() + "\n";
-		}
-
-		return output;
-	}
-
 	// Widget list methods
 	int get length => widgetFactories.length;
 
@@ -100,6 +90,19 @@ class PanelData {
 	
 	UWFactory removeAt(int index) {
 		return widgetFactories.removeAt(index);
+	}
+
+	/// Get the string preview of this widget for use in the main menu
+	String getPreview() {
+		String output = "";
+		for (var w in widgetFactories) {
+			var preview = w.previewString();
+			if (preview.isNotEmpty) {
+				output += preview + "\n";
+			}
+		}
+
+		return output;
 	}
 
 	/// The primary build function used to convert the data structure into
