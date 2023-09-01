@@ -111,6 +111,67 @@ class _MainPageState extends State<MainPage> {
 				backgroundColor: COLOR_MENU_BG,
 			),
 
+			drawer: menuData.mode != GlobalSelectionMode.view ? null : Drawer(
+				child: Column(
+					crossAxisAlignment: CrossAxisAlignment.start,
+					
+					children: [
+						Container(
+							width: double.infinity,
+							child: const DrawerHeader(
+								decoration: BoxDecoration(
+									color: COLOR_MENU_BG,
+								),
+								child: const Text('Panels'),
+							),
+						),
+						ListTile(
+							title: Row(
+								children: [
+									Icon(Icons.home),
+									SizedBox(
+										width: 10,
+									),
+									Text('Home')
+								],
+							),
+							onTap: () {},
+						),
+						ListTile(
+							title: Row(
+								children: [
+									Icon(Icons.delete),
+									SizedBox(
+										width: 10,
+									),
+									Text('Trash')
+								],
+							),
+							onTap: () {},
+						),
+						ListTile(
+							title: Row(
+								children: [
+									Icon(Icons.restore),
+									SizedBox(
+										width: 10,
+									),
+									Text('Backups')
+								],
+							),
+							onTap: () {},
+						),
+
+						Divider(),
+						Spacer(),
+						ListTile(
+							title: const Text('Donate'),
+							onTap: () {},
+						),
+					],
+				),
+			),
+
 			body: Container(
 				height: double.infinity,	
 				width: double.infinity,
@@ -148,6 +209,7 @@ class _MainPageState extends State<MainPage> {
 					},
 				),
 			),
+			
 			bottomNavigationBar: BottomAppBar(
 				color: COLOR_MENU_BG,
 				child: Row(children: [
@@ -189,7 +251,12 @@ class _MainPageState extends State<MainPage> {
 		try {
 			final dir = await _getLocalDir();
 			final entities = await dir.list().toList();
+			final Iterable<Directory> dirs = entities.whereType<Directory>();
 			final Iterable<File> files = entities.whereType<File>();
+
+			for (var d in dirs) {
+
+			}
 
 			for (var f in files) {
 				PanelData.fromFile(f).then((pd) {
