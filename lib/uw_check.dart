@@ -78,6 +78,7 @@ class _UWCheckState extends State<UWCheck> {
 				setState(() {
 					widget.factory.state = value!;
 				});
+				widget.controller.requestSave();
 			},
 		);
 		TextField field = TextField(
@@ -89,6 +90,7 @@ class _UWCheckState extends State<UWCheck> {
 			controller: _textController,
 			onChanged: (value) {
 			  widget.factory.text = value;
+				widget.controller.requestSave();
 			},
 		);
 		

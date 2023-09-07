@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:panels/panel_data.dart';
 import 'package:panels/uw_check_controller.dart';
@@ -71,10 +73,22 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 	late PanelData widgetPage;
 
 	// These functions update the backend AND force the list to update its display 
-	void add(UWFactory w) => setState(() => widgetPage.add(w));
-	void insert(int index, UWFactory w) => setState(() => widgetPage.insert(index, w));
-	void insertAfter(Key k, UWFactory w) => setState(() => widgetPage.insertAfter(k, w));
-	void remove(Key k) => setState(() => widgetPage.remove(k));
+	void add(UWFactory w) {
+		setState(() => widgetPage.add(w));
+		requestSave();
+	}
+	void insert(int index, UWFactory w) {
+		setState(() => widgetPage.insert(index, w));
+		requestSave();
+	}
+	void insertAfter(Key k, UWFactory w) {
+		setState(() => widgetPage.insertAfter(k, w));
+		requestSave();
+	}
+	void remove(Key k) {
+		setState(() => widgetPage.remove(k));
+		requestSave();
+	}
 
 	/// Sends the message to every single widget factory,
 	/// including the one which sends the message
@@ -95,13 +109,40 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 			setState(() {});
 		}
 	}
-	
+
+	/// Request to save the active NotePanel
+	/// By default, the file will be saved at the next periodic save interval
+	/// If the immediate flag is set, the file will be saved without waiting 
+	bool saveFlag = false;
+	void requestSave({bool immediate = false}) {
+		if (immediate) {
+			saveFlag = false;
+			widgetPage.saveFile();
+		} else {
+			saveFlag = true;
+		}
+	}
+
+	late Timer saveTimer;
 	// Flutter code
 	@override
 	void initState() {
 		super.initState();
 
 		widgetPage = widget.initialPage;
+
+		saveTimer = Timer.periodic(
+			const Duration(
+				seconds: 5,
+			),
+			(t) {
+				if (saveFlag) {
+					widgetPage.saveFile();
+					saveFlag = false;
+					print("Saving" + t.tick.toString());
+				}
+			},
+		);
 	}
 
 	@override
@@ -174,5 +215,6 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 	@override
 	void dispose() {
 		super.dispose();
+		saveTimer.cancel();
 	}
 }

@@ -67,6 +67,7 @@ class _UWTextState extends State<UWText> {
 			maxLines: 1024,
 			onChanged: (value) {
 			  widget.factory.text = value;
+				widget.controller.requestSave();
 			},
 		);
 

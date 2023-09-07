@@ -110,6 +110,7 @@ class _UWCheckControllerState extends State<UWCheckController> {
 							setState(() {
 								widget.factory.controlMode = value!;
 							});
+							widget.controller.requestSave();
 						},
 						items: ControlMode.values.map((e) {
 							return DropdownMenuItem<ControlMode>(

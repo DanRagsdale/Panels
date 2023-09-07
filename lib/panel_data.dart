@@ -17,24 +17,16 @@ class PanelData {
 	PanelData._(this.title, this.widgetFactories, this.file);
 
 	static Future<PanelData> newWithFile(File file) async {
-		try {
-			PanelData pd = PanelData._("Json Title!", [], file);
-			pd.saveFile();
-			return pd;
-		} catch (e) {
-			return PanelData._("Error!", [], file);
-		}
+		PanelData pd = PanelData._("Untitled Note", [], file);
+		pd.saveFile();
+		return pd;
 	}
 
 	static Future<PanelData> fromFile(File file) async {
-		try {
-			PanelData pd = PanelData._("temp", [], file);
-			await pd.readFile();
+		PanelData pd = PanelData._("Unable to read file", [], file);
+		await pd.readFile();
 
-			return pd;
-		} catch (e) {
-			return PanelData._("Error!", [], file);
-		}
+		return pd;
 	}
 	
 	// Serialization methods
@@ -53,21 +45,23 @@ class PanelData {
 				UWFactory fac = UWFactory.fromJsonMap(w);
 				widgetFactories.add(fac);
 			}
-		} catch (e) {
-		}
+		} catch (e) {}
 	}
 	
-	Future<File> saveFile() async {
-		var widgetMaps = [];
-		for (var w in widgetFactories) {
-			widgetMaps.add(w.toJsonMap());
-		}
-		// Write the file
-		var output = jsonEncode({
-			"title" : title,
-			"widgets" : widgetMaps,
-		});
-		return file.writeAsString(output);
+	Future<void> saveFile() async {
+		try {
+			var widgetMaps = [];
+			for (var w in widgetFactories) {
+				widgetMaps.add(w.toJsonMap());
+			}
+			// Write the file
+			var output = jsonEncode({
+				"title" : title,
+				"widgets" : widgetMaps,
+			});
+
+			file.writeAsString(output);
+		} catch(e) {}
 	}
 
 	// Widget list methods
