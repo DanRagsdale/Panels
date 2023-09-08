@@ -3,11 +3,11 @@ import 'package:panels/main.dart';
 
 import 'main_menu_data.dart';
 
-/// The widget that represents a specifc NotePanel on the main page
-class PanelIcon extends StatelessWidget {
-	final EntryPanel panelMenu;
+/// The widget that represents a specifc directory on the main page
+class DirIcon extends StatelessWidget {
+	final EntryDirectory entry;
 	
-	PanelIcon({required this.panelMenu});
+	DirIcon({required this.entry});
 
 	@override
 	Widget build(BuildContext context) {
@@ -24,17 +24,15 @@ class PanelIcon extends StatelessWidget {
 			child: Column(
 				children: [
 					Text(
-						panelMenu.panel.title,
-						style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
-					Expanded(
-						child: Text(panelMenu.panel.getPreview(),
-						),
+						"Directory",
+						style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
 					),
+					Icon(Icons.folder),
 				],
 			),
 		);
 
-		if (panelMenu.mode == LocalSelectionMode.unselected) {
+		if (entry.mode == LocalSelectionMode.unselected) {
 			return note_icon;
 		}
 
@@ -45,7 +43,7 @@ class PanelIcon extends StatelessWidget {
 					shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
 					fillColor: MaterialStateColor.resolveWith((states) => COLOR_MENU_COLD),
 
-					value: panelMenu.mode == LocalSelectionMode.selected,
+					value: entry.mode == LocalSelectionMode.selected,
 					onChanged: null,
 				),
 			],

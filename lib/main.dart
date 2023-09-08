@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:panels/dir_icon.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:panels/panel_data.dart';
@@ -185,14 +186,25 @@ class _MainPageState extends State<MainPage> {
 						childAspectRatio: 1.0,
 					),
 					itemBuilder: (context, index) {
+						MenuEntry childData = menuData.getMenuContainer(index);
+						
+						late Widget childWidget;
+						if (childData is EntryPanel) {
+							childWidget = PanelIcon(panelMenu: childData);
+						} else if (childData is EntryDirectory){
+							childWidget = DirIcon(entry: childData);
+						}
+
 						return GestureDetector(
 							onTap: () {
 								if (menuData.mode == GlobalSelectionMode.view) {
-									Navigator.of(context).push(
-										MaterialPageRoute(
-											builder: (context) => EditorPage(initialPage: menuData[index]),
-										),
-									).then((value) => setState(() {}));
+									if (childData is EntryPanel) {
+										Navigator.of(context).push(
+											MaterialPageRoute(
+												builder: (context) => EditorPage(initialPage: childData.panel),
+											),
+										).then((value) => setState(() {}));
+									}
 								} else {
 									setState(() {
 										menuData.toggleSelection(index);
@@ -204,7 +216,7 @@ class _MainPageState extends State<MainPage> {
 									menuData.select(index);
 								});
 							},
-							child: PanelIcon(panelMenu: menuData.getMenuContainer(index)),
+							child: childWidget,
 						);
 					},
 				),
@@ -223,7 +235,9 @@ class _MainPageState extends State<MainPage> {
 					IconButton(
 						icon: const Icon(Icons.create_new_folder_sharp),
 						tooltip: 'New Folder',
-						onPressed: () {},
+						onPressed: () {
+							newDir();
+						},
 					),
 					Spacer(),
 					IconButton(
@@ -255,7 +269,7 @@ class _MainPageState extends State<MainPage> {
 			final Iterable<File> files = entities.whereType<File>();
 
 			for (var d in dirs) {
-
+				menuData.addDir(d);
 			}
 
 			for (var f in files) {
@@ -279,13 +293,23 @@ class _MainPageState extends State<MainPage> {
 			});
 		});
 	}
+	
+	Future<void> newDir() async {
+		final path = await _localPath;
+		final name = "dir" + DateTime.now().millisecondsSinceEpoch.toString();
+		final filename = '$path/note_panels/$name';
+		var dir =  await Directory(filename).create();
+		setState(() {
+			menuData.addDir(dir);
+		});
+	}
 
 	/// Delete all of the currently selected notes
 	Future<void> deleteSelected() async {
 		var removed = menuData.removeSelected();
-		for (var pd in removed) {
+		for (var entry in removed) {
 			try {
-				await pd.file.delete();
+				await entry.deleteFile();
 			} catch (e) {}
 		}
 	}
