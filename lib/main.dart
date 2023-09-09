@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:panels/dir_icon.dart';
+import 'package:panels/menu_icon_dir.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:panels/panel_data.dart';
 
-import 'panel_icon.dart';
+import 'menu_icon_panel.dart';
 import 'editor_page.dart';
 import 'main_menu_data.dart';
 
@@ -43,18 +43,56 @@ class _MyAppState extends State<MyApp> {
 }
 
 class MainPage extends StatefulWidget {
+	final DirContainer? directory;
+
+	MainPage({this.directory});
+
 	@override
 	State<MainPage> createState() => _MainPageState();
 }
 
+class DirContainer {
+	Directory dir;
+
+	DirContainer(this.dir);
+
+	String get path => dir.path;
+
+	String get fileName => dir.path.split('/').last;
+
+	String get displayName => fileName.split('-*-').last;
+	
+	Future<void> inPlaceRename(String newDispName) async {
+		var oldPathList = dir.path.split('/');
+		var oldNameList = oldPathList.last.split('-*-');
+		
+		oldNameList.last = newDispName;
+
+		var newName = oldNameList.join('-*-');
+		oldPathList.last = newName;
+
+		var newPath = oldPathList.join('/');
+
+		var newDir = await dir.rename(newPath);
+		dir = newDir;
+	}
+}
+
 class _MainPageState extends State<MainPage> {
-	SelectionMenuData menuData = SelectionMenuData();
+	late SelectionMenuData menuData;
+	
+	DirContainer? _activeDir;	
+	bool isHomeDir = true;
 
 	@override
 	void initState() {
 		super.initState();
+		_activeDir = widget.directory;
+		isHomeDir = _activeDir == null;
 		readFiles();
 	}
+
+	TextEditingController _titleController = TextEditingController();
 
 	@override
 	Widget build(BuildContext context) {
@@ -78,7 +116,21 @@ class _MainPageState extends State<MainPage> {
 		// Top toolbar widget
 		late Widget topBar;
 		if (menuData.mode == GlobalSelectionMode.view) {
-			topBar = const Text("Panels");
+			if (isHomeDir) {
+				topBar = const Text("Panels");
+			} else {
+				_titleController.text = _activeDir!.displayName;
+				topBar = TextField(
+					decoration: null,
+					controller: _titleController,
+					style: TextStyle(fontWeight: FontWeight.bold),
+					onChanged: (value) {
+						try {
+							_activeDir?.inPlaceRename(value);
+						} catch(e) {}
+					}
+				);
+			}
 		} else {
 			topBar = Row(
 				children: [
@@ -104,7 +156,7 @@ class _MainPageState extends State<MainPage> {
 				],
 			);
 		}
-
+		
 		return Scaffold(
 			appBar: AppBar(
 				title: topBar,
@@ -186,13 +238,13 @@ class _MainPageState extends State<MainPage> {
 						childAspectRatio: 1.0,
 					),
 					itemBuilder: (context, index) {
-						MenuEntry childData = menuData.getMenuContainer(index);
+						MenuEntry childData = menuData.getMenuEntry(index);
 						
 						late Widget childWidget;
 						if (childData is EntryPanel) {
-							childWidget = PanelIcon(panelMenu: childData);
+							childWidget = MenuIconPanel(panelMenu: childData);
 						} else if (childData is EntryDirectory){
-							childWidget = DirIcon(entry: childData);
+							childWidget = MenuIconDir(entry: childData);
 						}
 
 						return GestureDetector(
@@ -202,6 +254,12 @@ class _MainPageState extends State<MainPage> {
 										Navigator.of(context).push(
 											MaterialPageRoute(
 												builder: (context) => EditorPage(initialPage: childData.panel),
+											),
+										).then((value) => setState(() {}));
+									} else if (childData is EntryDirectory) {
+										Navigator.of(context).push(
+											MaterialPageRoute(
+												builder: (context) => MainPage(directory: childData.dir),
 											),
 										).then((value) => setState(() {}));
 									}
@@ -251,6 +309,29 @@ class _MainPageState extends State<MainPage> {
 	}
 
 	// IO functions
+
+	//Future<Directory?> renameDir(String newDispName) async {
+	//	if (_activeDir == null) {
+	//		return null;
+	//	}
+
+	//	var oldPathList = _activeDir!.path.split('/');
+	//	var oldNameList = oldPathList.last.split('-*-');
+	//	
+	//	oldNameList.last = newDispName;
+
+	//	var newName = oldNameList.join('-*-');
+	//	oldPathList.last = newName;
+
+	//	var newPath = oldPathList.join('/');
+
+	//	var newDir = await _activeDir!.rename(newPath);
+	//	_activeDir = newDir;
+	//	return newDir;
+
+	//}
+
+	// Helper Functions
 	Future<String> get _localPath async {
 		final directory = await getApplicationDocumentsDirectory();
 		return directory.path;
@@ -261,21 +342,34 @@ class _MainPageState extends State<MainPage> {
 		return Directory('$path/note_panels').create(recursive: true);
 	}
 
+	Future<DirContainer> _getActiveDir() async {
+		if (_activeDir == null) {
+			final path = await _localPath;
+			Directory rawDir = await Directory('$path/note_panels').create(recursive: true);
+			_activeDir = DirContainer(rawDir);
+		}
+		return _activeDir!;
+	}
+
+	// Main IO functions
 	Future<void> readFiles() async {
+		setState(() {
+			menuData = SelectionMenuData();
+		});
 		try {
-			final dir = await _getLocalDir();
-			final entities = await dir.list().toList();
+			final dirCon = await _getActiveDir();
+			final entities = await dirCon.dir.list().toList();
 			final Iterable<Directory> dirs = entities.whereType<Directory>();
 			final Iterable<File> files = entities.whereType<File>();
 
 			for (var d in dirs) {
-				menuData.addDir(d);
+				menuData.addDir(DirContainer(d));
 			}
 
 			for (var f in files) {
 				PanelData.fromFile(f).then((pd) {
 					setState(() {
-						menuData.add(pd);
+						menuData.addPanel(pd);
 					});
 				});
 			}
@@ -283,24 +377,24 @@ class _MainPageState extends State<MainPage> {
 	}
 
 	Future<void> newNote() async {
-		final path = await _localPath;
+		DirContainer dir = await _getActiveDir();
 		final name = "panel" + DateTime.now().millisecondsSinceEpoch.toString() + ".json";
-		final filename = '$path/note_panels/$name';
+		final filename = '${dir.path}/$name';
 		var file =  await File(filename);
 		PanelData.newWithFile(file).then((pd) {
 			setState(() {
-				menuData.add(pd);
+				menuData.addPanel(pd);
 			});
 		});
 	}
 	
 	Future<void> newDir() async {
 		final path = await _localPath;
-		final name = "dir" + DateTime.now().millisecondsSinceEpoch.toString();
+		final name = "dir" + DateTime.now().millisecondsSinceEpoch.toString() + "-*-New Folder";
 		final filename = '$path/note_panels/$name';
 		var dir =  await Directory(filename).create();
 		setState(() {
-			menuData.addDir(dir);
+			menuData.addDir(DirContainer(dir));
 		});
 	}
 

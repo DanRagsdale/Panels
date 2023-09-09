@@ -4,10 +4,10 @@ import 'package:panels/main.dart';
 import 'main_menu_data.dart';
 
 /// The widget that represents a specifc directory on the main page
-class DirIcon extends StatelessWidget {
+class MenuIconDir extends StatelessWidget {
 	final EntryDirectory entry;
 	
-	DirIcon({required this.entry});
+	MenuIconDir({required this.entry});
 
 	@override
 	Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class DirIcon extends StatelessWidget {
 			child: Column(
 				children: [
 					Text(
-						"Directory",
+						entry.displayName,
 						style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
 					),
 					Icon(Icons.folder),

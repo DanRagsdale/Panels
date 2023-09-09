@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:panels/main.dart';
+
 import 'panel_data.dart';
 
 /// Enum representing the global section mode of the main menu.
@@ -22,30 +24,21 @@ enum LocalSelectionMode {
 	selected,
 }
 
-enum EntryType {
-	panel,
-	directory,
-}
-
-/// Backend data structure that is used to create a PanelIcon in the menu
+/// Backend data structure that is used to create an entry in the menu
 abstract class MenuEntry {
-	EntryType get type;	
-
 	LocalSelectionMode? get mode;
 	void set mode(LocalSelectionMode? m);
 
 	Future<FileSystemEntity> deleteFile();
 }
 
+/// Backend data structure representing a NotePanel in the menu
 class EntryPanel extends MenuEntry {
 	LocalSelectionMode? _mode;
 
 	PanelData panel;
 	EntryPanel(this.panel, this._mode);
 	
-	@override
-	EntryType get type => EntryType.panel;
-
 	@override	
 	LocalSelectionMode? get mode => _mode;
 	@override
@@ -57,15 +50,13 @@ class EntryPanel extends MenuEntry {
 	}
 }
 
+/// Backend data structure representing a directory in the menu
 class EntryDirectory extends MenuEntry {
-	Directory dir;
+	DirContainer dir;
 	LocalSelectionMode? _mode;
 
 	EntryDirectory(this.dir, this._mode);
 
-	@override
-	EntryType get type => EntryType.directory;
-	
 	@override	
 	LocalSelectionMode? get mode => _mode;
 	@override
@@ -73,7 +64,15 @@ class EntryDirectory extends MenuEntry {
 	
 	@override
 	Future<FileSystemEntity> deleteFile() async {
-		return dir.delete(recursive: true);
+		return dir.dir.delete(recursive: true);
+	}
+
+	String get fileName {
+		return dir.path.split('/').last;
+	}
+
+	String get displayName {
+		return fileName.split('-*-').last;
 	}
 }
 
@@ -86,11 +85,11 @@ class SelectionMenuData {
 	int get length => menuItems.length;
 	operator [](int i) => menuItems[i]; // get
 
-	void add(PanelData pd) {
+	void addPanel(PanelData pd) {
 		menuItems.add(EntryPanel(pd, null));
 	}
 
-	void addDir(Directory d) {
+	void addDir(DirContainer d) {
 		menuItems.add(EntryDirectory(d, null));
 	}
 
@@ -108,7 +107,7 @@ class SelectionMenuData {
 		return removals;
 	}
 
-	MenuEntry getMenuContainer(int index) {
+	MenuEntry getMenuEntry(int index) {
 		if (selections.contains(index)) {
 			MenuEntry item = menuItems[index];
 			item.mode = LocalSelectionMode.selected;

@@ -4,10 +4,10 @@ import 'package:panels/main.dart';
 import 'main_menu_data.dart';
 
 /// The widget that represents a specifc NotePanel on the main page
-class PanelIcon extends StatelessWidget {
+class MenuIconPanel extends StatelessWidget {
 	final EntryPanel panelMenu;
 	
-	PanelIcon({required this.panelMenu});
+	MenuIconPanel({required this.panelMenu});
 
 	@override
 	Widget build(BuildContext context) {
