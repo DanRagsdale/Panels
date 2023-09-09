@@ -16,8 +16,8 @@ class PanelData {
 
 	PanelData._(this.title, this.widgetFactories, this.file);
 
-	static Future<PanelData> newWithFile(File file) async {
-		PanelData pd = PanelData._("Untitled Note", [], file);
+	static Future<PanelData> newWithFile({required File file, List<UWFactory> factories = const [],}) async {
+		PanelData pd = PanelData._("Untitled Note", factories, file);
 		pd.saveFile();
 		return pd;
 	}

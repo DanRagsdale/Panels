@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:panels/menu_icon_dir.dart';
+import 'package:panels/user_widget.dart';
+import 'package:panels/uw_text.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:panels/panel_data.dart';
@@ -51,17 +53,19 @@ class MainPage extends StatefulWidget {
 	State<MainPage> createState() => _MainPageState();
 }
 
+/// Container holding a reference to a directory
+/// Used to allow in place renaming and moving of directories
 class DirContainer {
 	Directory dir;
 
 	DirContainer(this.dir);
 
 	String get path => dir.path;
-
 	String get fileName => dir.path.split('/').last;
-
 	String get displayName => fileName.split('-*-').last;
-	
+
+	/// Moves the underlying directory to the new name and sets
+	/// the directory reference to the new location	
 	Future<void> inPlaceRename(String newDispName) async {
 		var oldPathList = dir.path.split('/');
 		var oldNameList = oldPathList.last.split('-*-');
@@ -98,21 +102,6 @@ class _MainPageState extends State<MainPage> {
 	Widget build(BuildContext context) {
 		// TODO add trash can and undo functions when deleting
 	
-		//var snackBar = SnackBar(
-		//	padding: EdgeInsets.only(left: 8.0, right: 8.0),
-		//	content: Row(
-		//		children: [
-		//			Text("Items moved to trash"),
-		//			Spacer(),
-		//			TextButton(
-		//				child: Text("Undo"),
-		//				onPressed: () {
-		//				},
-		//			),
-		//		],
-		//	),
-		//);
-
 		// Top toolbar widget
 		late Widget topBar;
 		if (menuData.mode == GlobalSelectionMode.view) {
@@ -142,21 +131,26 @@ class _MainPageState extends State<MainPage> {
 							});
 						},
 					),
+					Text("${menuData.selectedCount} Selected"),
 					Spacer(),
+					IconButton(
+						//TODO set up to use the actual 'move item' icon
+						icon: Icon(Icons.move_up_outlined),
+						onPressed: () {
+						},
+					),
 					IconButton(
 						icon: Icon(Icons.delete),
 						onPressed: () {
 							deleteSelected().then((value) {
-								//ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then(
-								//	(value) {}
-								//);
 								setState(() {});
 							});
-						})
+						},
+					),
 				],
 			);
 		}
-		
+
 		return Scaffold(
 			appBar: AppBar(
 				title: topBar,
@@ -164,7 +158,7 @@ class _MainPageState extends State<MainPage> {
 				backgroundColor: COLOR_MENU_BG,
 			),
 
-			drawer: menuData.mode != GlobalSelectionMode.view ? null : Drawer(
+			drawer: (menuData.mode == GlobalSelectionMode.view && isHomeDir) ? Drawer(
 				child: Column(
 					crossAxisAlignment: CrossAxisAlignment.start,
 					
@@ -178,18 +172,18 @@ class _MainPageState extends State<MainPage> {
 								child: const Text('Panels'),
 							),
 						),
-						ListTile(
-							title: Row(
-								children: [
-									Icon(Icons.home),
-									SizedBox(
-										width: 10,
-									),
-									Text('Home')
-								],
-							),
-							onTap: () {},
-						),
+						//ListTile(
+						//	title: Row(
+						//		children: [
+						//			Icon(Icons.home),
+						//			SizedBox(
+						//				width: 10,
+						//			),
+						//			Text('Home')
+						//		],
+						//	),
+						//	onTap: () {},
+						//),
 						ListTile(
 							title: Row(
 								children: [
@@ -218,12 +212,12 @@ class _MainPageState extends State<MainPage> {
 						Divider(),
 						Spacer(),
 						ListTile(
-							title: const Text('Donate'),
+							title: const Text('Support'),
 							onTap: () {},
 						),
 					],
 				),
-			),
+			) : null,
 
 			body: Container(
 				height: double.infinity,	
@@ -287,7 +281,7 @@ class _MainPageState extends State<MainPage> {
 						icon: const Icon(Icons.note_add),
 						tooltip: 'New Note',
 						onPressed: () {
-							newNote();
+							newNote(factories: [UWTextFactory(GlobalKey())]);
 						},
 					),
 					IconButton(
@@ -309,37 +303,10 @@ class _MainPageState extends State<MainPage> {
 	}
 
 	// IO functions
-
-	//Future<Directory?> renameDir(String newDispName) async {
-	//	if (_activeDir == null) {
-	//		return null;
-	//	}
-
-	//	var oldPathList = _activeDir!.path.split('/');
-	//	var oldNameList = oldPathList.last.split('-*-');
-	//	
-	//	oldNameList.last = newDispName;
-
-	//	var newName = oldNameList.join('-*-');
-	//	oldPathList.last = newName;
-
-	//	var newPath = oldPathList.join('/');
-
-	//	var newDir = await _activeDir!.rename(newPath);
-	//	_activeDir = newDir;
-	//	return newDir;
-
-	//}
-
 	// Helper Functions
 	Future<String> get _localPath async {
 		final directory = await getApplicationDocumentsDirectory();
 		return directory.path;
-	}
-
-	Future<Directory> _getLocalDir() async {
-		final path = await _localPath;
-		return Directory('$path/note_panels').create(recursive: true);
 	}
 
 	Future<DirContainer> _getActiveDir() async {
@@ -376,12 +343,12 @@ class _MainPageState extends State<MainPage> {
 		} catch (e) {}
 	}
 
-	Future<void> newNote() async {
+	Future<void> newNote({List<UWFactory> factories = const []}) async {
 		DirContainer dir = await _getActiveDir();
 		final name = "panel" + DateTime.now().millisecondsSinceEpoch.toString() + ".json";
 		final filename = '${dir.path}/$name';
 		var file =  await File(filename);
-		PanelData.newWithFile(file).then((pd) {
+		PanelData.newWithFile(file: file, factories: factories).then((pd) {
 			setState(() {
 				menuData.addPanel(pd);
 			});
@@ -407,5 +374,4 @@ class _MainPageState extends State<MainPage> {
 			} catch (e) {}
 		}
 	}
-
 }

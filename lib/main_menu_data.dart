@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:panels/main.dart';
 
+import 'menu_icon_dir.dart';
+import 'menu_icon_panel.dart';
 import 'panel_data.dart';
 
 /// Enum representing the global section mode of the main menu.
@@ -24,7 +26,7 @@ enum LocalSelectionMode {
 	selected,
 }
 
-/// Backend data structure that is used to create an entry in the menu
+/// Backend data structure that is used to represent an entry in the menu
 abstract class MenuEntry {
 	LocalSelectionMode? get mode;
 	void set mode(LocalSelectionMode? m);
@@ -32,58 +34,14 @@ abstract class MenuEntry {
 	Future<FileSystemEntity> deleteFile();
 }
 
-/// Backend data structure representing a NotePanel in the menu
-class EntryPanel extends MenuEntry {
-	LocalSelectionMode? _mode;
-
-	PanelData panel;
-	EntryPanel(this.panel, this._mode);
-	
-	@override	
-	LocalSelectionMode? get mode => _mode;
-	@override
-	void set mode(LocalSelectionMode? m) => _mode = m;
-	
-	@override
-	Future<FileSystemEntity> deleteFile() async {
- 		return panel.file.delete();
-	}
-}
-
-/// Backend data structure representing a directory in the menu
-class EntryDirectory extends MenuEntry {
-	DirContainer dir;
-	LocalSelectionMode? _mode;
-
-	EntryDirectory(this.dir, this._mode);
-
-	@override	
-	LocalSelectionMode? get mode => _mode;
-	@override
-	void set mode(LocalSelectionMode? m) => _mode = m;
-	
-	@override
-	Future<FileSystemEntity> deleteFile() async {
-		return dir.dir.delete(recursive: true);
-	}
-
-	String get fileName {
-		return dir.path.split('/').last;
-	}
-
-	String get displayName {
-		return fileName.split('-*-').last;
-	}
-}
-
-/// Data structure representing a menu page in the main menu
+/// Data structure representing the files and folders in the main menu
 class SelectionMenuData {
 	List<MenuEntry> menuItems = [];
 	GlobalSelectionMode mode = GlobalSelectionMode.view;
 	Set<int> selections = {};
 
 	int get length => menuItems.length;
-	operator [](int i) => menuItems[i]; // get
+	operator [](int i) => menuItems[i];
 
 	void addPanel(PanelData pd) {
 		menuItems.add(EntryPanel(pd, null));
@@ -117,6 +75,8 @@ class SelectionMenuData {
 		item.mode = mode.defaultLocalMode;
 		return item;
 	}
+
+	int get selectedCount => selections.length;
 
 	void select(int index) {
 		mode = GlobalSelectionMode.selection;

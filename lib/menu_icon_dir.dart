@@ -1,7 +1,27 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:panels/main.dart';
 
 import 'main_menu_data.dart';
+
+/// Backend data structure representing a directory icon in the menu
+class EntryDirectory extends MenuEntry {
+	DirContainer dir;
+	LocalSelectionMode? _mode;
+
+	EntryDirectory(this.dir, this._mode);
+
+	@override	
+	LocalSelectionMode? get mode => _mode;
+	@override
+	void set mode(LocalSelectionMode? m) => _mode = m;
+	
+	@override
+	Future<FileSystemEntity> deleteFile() async {
+		return dir.dir.delete(recursive: true);
+	}
+}
 
 /// The widget that represents a specifc directory on the main page
 class MenuIconDir extends StatelessWidget {
@@ -24,7 +44,7 @@ class MenuIconDir extends StatelessWidget {
 			child: Column(
 				children: [
 					Text(
-						entry.displayName,
+						entry.dir.displayName,
 						style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
 					),
 					Icon(Icons.folder),

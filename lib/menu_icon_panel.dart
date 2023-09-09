@@ -1,7 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:panels/main.dart';
+import 'package:panels/panel_data.dart';
 
 import 'main_menu_data.dart';
+
+/// Backend data structure representing a NotePanel icon in the menu
+class EntryPanel extends MenuEntry {
+	LocalSelectionMode? _mode;
+
+	PanelData panel;
+	EntryPanel(this.panel, this._mode);
+	
+	@override	
+	LocalSelectionMode? get mode => _mode;
+	@override
+	void set mode(LocalSelectionMode? m) => _mode = m;
+	
+	@override
+	Future<FileSystemEntity> deleteFile() async {
+ 		return panel.file.delete();
+	}
+}
 
 /// The widget that represents a specifc NotePanel on the main page
 class MenuIconPanel extends StatelessWidget {
