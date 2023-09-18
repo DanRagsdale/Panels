@@ -73,7 +73,7 @@ class _UWTextState extends State<UWText> {
 
 		if (widget.mode == Mode.view) {
 			return Container(
-				padding: EdgeInsets.all(3),
+				padding: EdgeInsets.only(left: 14, right: 8, top: 2, bottom: 2),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
 					//border: Border.all(
@@ -86,7 +86,7 @@ class _UWTextState extends State<UWText> {
 		}
 		
 		return Container(
-			padding: EdgeInsets.all(3),
+			padding: EdgeInsets.only(left: 14, right: 8, top: 2, bottom: 2),
 			decoration: BoxDecoration(
 				color: COLOR_BACKGROUND_MID,
 				border: Border.all(

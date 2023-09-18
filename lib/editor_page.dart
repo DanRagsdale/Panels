@@ -43,6 +43,11 @@ class _EditorPageState extends State<EditorPage> {
 					controller: _titleController,
 					style: TextStyle(fontWeight: FontWeight.bold),
 					onChanged: (value) => widget.initialPage.title = value,
+					onTap: () {
+						if (_titleController.text == DEFAULT_NOTE_TILE) {
+							_titleController.text = '';
+						}
+					},
 				),
 			),
 			body: Container(
