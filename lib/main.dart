@@ -12,6 +12,7 @@ import 'package:panels/panel_data.dart';
 import 'menu_icon_panel.dart';
 import 'editor_page.dart';
 import 'main_menu_data.dart';
+import 'menu_move.dart';
 
 const Color COLOR_TEXT = Color(0xff000000);
 //const Color COLOR_MENU_TEXT = Color(0xff2E272D);
@@ -22,6 +23,9 @@ const Color COLOR_BACKGROUND_HEAVY = Color.fromARGB(255, 157, 164, 197);
 const Color COLOR_MENU_BG = Color(0xffFFDDD2);
 const Color COLOR_MENU_HOT = Color(0xff4FC5B9);
 const Color COLOR_MENU_COLD = Color.fromARGB(255, 2, 81, 88);
+
+const String DEFAULT_NOTE_TITLE = "Untitled Note";
+const String DEFAULT_FOLDER_TITLE = "New Folder";
 
 void main() {
 	runApp(MyApp());
@@ -113,6 +117,11 @@ class _MainPageState extends State<MainPage> {
 					decoration: null,
 					controller: _titleController,
 					style: TextStyle(fontWeight: FontWeight.bold),
+					onTap: () {
+						if (_titleController.text == DEFAULT_FOLDER_TITLE) {
+							_titleController.text = '';
+						}
+					},
 					onChanged: (value) {
 						try {
 							_activeDir?.inPlaceRename(value);
@@ -137,6 +146,23 @@ class _MainPageState extends State<MainPage> {
 						//TODO set up to use the actual 'move item' icon
 						icon: Icon(Icons.move_up_outlined),
 						onPressed: () {
+							showDialog<String>(
+								context: context,
+								builder: (BuildContext context) => AlertDialog(
+									title: const Text('Move Files'),
+									content: MenuMove(),
+									actions: <Widget>[
+										TextButton(
+											onPressed: () => Navigator.pop(context, 'Cancel'),
+											child: const Text('Cancel'),
+										),
+										TextButton(
+											onPressed: () => Navigator.pop(context, 'OK'),
+											child: const Text('OK'),
+										),
+									],
+								),
+							);
 						},
 					),
 					IconButton(
@@ -362,12 +388,12 @@ class _MainPageState extends State<MainPage> {
 	}
 	
 	Future<void> newDir() async {
-		final path = await _localPath;
-		final name = "dir" + DateTime.now().millisecondsSinceEpoch.toString() + "-*-New Folder";
-		final filename = '$path/note_panels/$name';
-		var dir =  await Directory(filename).create();
+		DirContainer dir = await _getActiveDir();
+		final name = "dir" + DateTime.now().millisecondsSinceEpoch.toString() + "-*-" + DEFAULT_FOLDER_TITLE;
+		final filename = '${dir.path}/$name';
+		var newDir =  await Directory(filename).create();
 		setState(() {
-			menuData.addDir(DirContainer(dir));
+			menuData.addDir(DirContainer(newDir));
 		});
 	}
 

@@ -7,8 +7,7 @@ import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
 import 'editor_page.dart';
-
-final String DEFAULT_NOTE_TILE = "Untitled Note";
+import 'main.dart';
 
 /// The backend data structure used to represent and manipulate a NotePanel
 class PanelData {
@@ -19,7 +18,7 @@ class PanelData {
 	PanelData._(this.title, this.widgetFactories, this.file);
 
 	static Future<PanelData> newWithFile({required File file, List<UWFactory> factories = const [],}) async {
-		PanelData pd = PanelData._(DEFAULT_NOTE_TILE, factories, file);
+		PanelData pd = PanelData._(DEFAULT_NOTE_TITLE, factories, file);
 		pd.saveFile();
 		return pd;
 	}
