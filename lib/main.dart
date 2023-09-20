@@ -107,57 +107,59 @@ class _MainPageState extends State<MainPage> {
 		// TODO add trash can and undo functions when deleting
 	
 		// Top toolbar widget
-		//TODO properly utilize AppBar Features
-		late Widget topBar;
+		late AppBar topBar;
 		if (menuData.mode == GlobalSelectionMode.view) {
 			if (isHomeDir) {
-				topBar = const Text("Panels");
+				topBar = AppBar(
+					foregroundColor: COLOR_TEXT,
+					backgroundColor: COLOR_MENU_BG,
+					title: const Text("Panels"),
+				);
 			} else {
 				_titleController.text = _activeDir!.displayName;
-				topBar = TextField(
-					decoration: null,
-					controller: _titleController,
-					style: TextStyle(fontWeight: FontWeight.bold),
-					onTap: () {
-						if (_titleController.text == DEFAULT_FOLDER_TITLE) {
-							_titleController.text = '';
-						}
-					},
-					onChanged: (value) {
-						try {
-							_activeDir?.inPlaceRename(value);
-						} catch(e) {}
-					}
+				topBar = AppBar(
+					foregroundColor: COLOR_TEXT,
+					backgroundColor: COLOR_MENU_BG,
+					title: TextField(
+						decoration: null,
+						controller: _titleController,
+						style: TextStyle(fontWeight: FontWeight.bold),
+						onTap: () {
+							if (_titleController.text == DEFAULT_FOLDER_TITLE) {
+								_titleController.text = '';
+							}
+						},
+						onChanged: (value) {
+							try {
+								_activeDir?.inPlaceRename(value);
+							} catch(e) {}
+						},
+					),
 				);
 			}
 		} else {
-			topBar = Row(
-				children: [
+			topBar = AppBar(
+				foregroundColor: COLOR_TEXT,
+				backgroundColor: COLOR_MENU_BG,
+				leading: IconButton(
+					icon: Icon(Icons.close_outlined),
+					onPressed: () {
+						setState(() {
+							menuData.deselectAll();
+						});
+					},
+				),
+				title: Text("${menuData.selectedCount} Selected"),
+				actions: [
 					IconButton(
-						icon: Icon(Icons.close_outlined),
-						onPressed: () {
-							setState(() {
-								menuData.deselectAll();
-							});
-						},
-					),
-					Text("${menuData.selectedCount} Selected"),
-					Spacer(),
-					IconButton(
-						//TODO set up to use the actual 'move item' icon
 						icon: Icon(Icons.move_up_outlined),
 						onPressed: () {
 							MenuMove menuMove = MenuMove(menuData);
 							showDialog<DirContainer?>(
 								context: context,
 								builder: (BuildContext context) => Dialog(
-									//contentPadding: EdgeInsets.all(4.0),
 									insetPadding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 24.0),
 									child: menuMove,
-									//title: const Text('Move Files'),
-									
-									
-									//content: menuMove,
 								),
 							).then((value) async {
 								if (value != null && value != _activeDir?.path) {
@@ -188,11 +190,7 @@ class _MainPageState extends State<MainPage> {
 		}
 
 		return Scaffold(
-			appBar: AppBar(
-				title: topBar,
-				foregroundColor: COLOR_TEXT,
-				backgroundColor: COLOR_MENU_BG,
-			),
+			appBar: topBar,
 
 			drawer: (menuData.mode == GlobalSelectionMode.view && isHomeDir) ? Drawer(
 				child: Column(
