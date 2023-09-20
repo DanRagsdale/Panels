@@ -107,6 +107,7 @@ class _MainPageState extends State<MainPage> {
 		// TODO add trash can and undo functions when deleting
 	
 		// Top toolbar widget
+		//TODO properly utilize AppBar Features
 		late Widget topBar;
 		if (menuData.mode == GlobalSelectionMode.view) {
 			if (isHomeDir) {
@@ -146,23 +147,32 @@ class _MainPageState extends State<MainPage> {
 						//TODO set up to use the actual 'move item' icon
 						icon: Icon(Icons.move_up_outlined),
 						onPressed: () {
-							showDialog<String>(
+							MenuMove menuMove = MenuMove(menuData);
+							showDialog<DirContainer?>(
 								context: context,
-								builder: (BuildContext context) => AlertDialog(
-									title: const Text('Move Files'),
-									content: MenuMove(),
-									actions: <Widget>[
-										TextButton(
-											onPressed: () => Navigator.pop(context, 'Cancel'),
-											child: const Text('Cancel'),
-										),
-										TextButton(
-											onPressed: () => Navigator.pop(context, 'OK'),
-											child: const Text('OK'),
-										),
-									],
+								builder: (BuildContext context) => Dialog(
+									//contentPadding: EdgeInsets.all(4.0),
+									insetPadding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 24.0),
+									child: menuMove,
+									//title: const Text('Move Files'),
+									
+									
+									//content: menuMove,
 								),
-							);
+							).then((value) async {
+								if (value != null && value != _activeDir?.path) {
+									List<MenuEntry> selections = menuData.removeSelected();
+									setState(() {});
+									for (var s in selections) {
+										try {
+											print(value.path);
+											await s.moveTo(value.path);
+										} catch(e) {
+											print(e.toString());
+										}
+									}
+								}
+							});
 						},
 					),
 					IconButton(
@@ -266,7 +276,7 @@ class _MainPageState extends State<MainPage> {
 						} else if (childData is EntryDirectory){
 							childWidget = MenuIconDir(entry: childData);
 						}
-
+						
 						return GestureDetector(
 							onTap: () {
 								if (menuData.mode == GlobalSelectionMode.view) {
@@ -281,7 +291,7 @@ class _MainPageState extends State<MainPage> {
 											MaterialPageRoute(
 												builder: (context) => MainPage(directory: childData.dir),
 											),
-										).then((value) => setState(() {}));
+										).then((value) => readFiles()); // User may have moved files, necessitating a full rebuild
 									}
 								} else {
 									setState(() {
@@ -361,9 +371,11 @@ class _MainPageState extends State<MainPage> {
 			final Iterable<Directory> dirs = entities.whereType<Directory>();
 			final Iterable<File> files = entities.whereType<File>();
 
-			for (var d in dirs) {
-				menuData.addDir(DirContainer(d));
-			}
+			setState(() {
+				for (var d in dirs) {
+						menuData.addDir(DirContainer(d));
+				}
+			});
 
 			for (var f in files) {
 				PanelData.fromFile(f).then((pd) {

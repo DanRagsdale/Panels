@@ -22,6 +22,16 @@ class EntryPanel extends MenuEntry {
 	Future<FileSystemEntity> deleteFile() async {
  		return panel.file.delete();
 	}
+	
+	@override	
+	Future<FileSystemEntity> moveTo(String destDirPath) {
+		//return dir.dir.rename(destDirpath + '/' + dir.fileName);
+		var path = panel.file.path;
+		var lastSeparator = path.lastIndexOf(Platform.pathSeparator);
+		var newPath = destDirPath + Platform.pathSeparator + path.substring(lastSeparator + 1);
+		print(newPath);
+		return panel.file.rename(newPath);
+	}
 }
 
 /// The widget that represents a specifc NotePanel on the main page

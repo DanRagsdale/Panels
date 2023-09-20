@@ -21,6 +21,13 @@ class EntryDirectory extends MenuEntry {
 	Future<FileSystemEntity> deleteFile() async {
 		return dir.dir.delete(recursive: true);
 	}
+
+	@override	
+	Future<FileSystemEntity> moveTo(String destDirpath) async {
+		var newPath = destDirpath + '/' + dir.fileName;
+		print(newPath);
+		return dir.dir.rename(newPath);
+	}
 }
 
 /// The widget that represents a specifc directory on the main page

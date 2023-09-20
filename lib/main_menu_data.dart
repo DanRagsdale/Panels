@@ -32,6 +32,7 @@ abstract class MenuEntry {
 	void set mode(LocalSelectionMode? m);
 
 	Future<FileSystemEntity> deleteFile();
+	Future<FileSystemEntity> moveTo(String destDirPath);
 }
 
 /// Data structure representing the files and folders in the main menu
@@ -74,6 +75,18 @@ class SelectionMenuData {
 		MenuEntry item = menuItems[index];
 		item.mode = mode.defaultLocalMode;
 		return item;
+	}
+
+	bool isSelectedDir(Directory dir){
+		for (var i in selections) {
+			MenuEntry entry = menuItems[i];
+			if (entry is EntryDirectory) {
+				if (entry.dir.path == dir.path) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	int get selectedCount => selections.length;
