@@ -17,7 +17,12 @@ class EntryDirectory extends MenuEntry {
 	LocalSelectionMode? get mode => _mode;
 	@override
 	void set mode(LocalSelectionMode? m) => _mode = m;
-	
+
+	@override	
+	String get displayName {
+		return dir.displayName;
+	}
+
 	@override
 	Future<FileSystemEntity> deleteFile() async {
 		return dir.dir.delete(recursive: true);

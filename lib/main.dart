@@ -255,7 +255,11 @@ class _MainPageState extends State<MainPage> {
 											MaterialPageRoute(
 												builder: (context) => EditorPage(initialPage: childData.panel),
 											),
-										).then((value) => setState(() {}));
+										).then((value) {
+												setState(() {
+													menuData.sort(SortMode.alphabetical);
+												});
+										});
 									} else if (childData is EntryDirectory) {
 										Navigator.of(context).push(
 											MaterialPageRoute(
@@ -334,19 +338,19 @@ class _MainPageState extends State<MainPage> {
 			final Iterable<Directory> dirs = entities.whereType<Directory>();
 			final Iterable<File> files = entities.whereType<File>();
 
-			setState(() {
-				for (var d in dirs) {
-						menuData.addDir(DirContainer(d));
-				}
-			});
+			for (var d in dirs) {
+					menuData.addDir(DirContainer(d));
+			}
 
 			for (var f in files) {
-				PanelData.fromFile(f).then((pd) {
-					setState(() {
-						menuData.addPanel(pd);
-					});
-				});
+				PanelData pd = await PanelData.fromFile(f);
+				menuData.addPanel(pd);
 			}
+
+			setState(() {
+			  menuData.sort(SortMode.alphabetical);
+			});
+
 		} catch (e) {}
 	}
 

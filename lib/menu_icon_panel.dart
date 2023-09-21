@@ -18,6 +18,11 @@ class EntryPanel extends MenuEntry {
 	@override
 	void set mode(LocalSelectionMode? m) => _mode = m;
 	
+	@override	
+	String get displayName {
+		return panel.title;
+	}
+
 	@override
 	Future<FileSystemEntity> deleteFile() async {
  		return panel.file.delete();

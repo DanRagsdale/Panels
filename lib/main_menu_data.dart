@@ -25,10 +25,30 @@ enum LocalSelectionMode {
 	selected,
 }
 
+enum SortMode {
+	alphabetical(_alphaSort);
+
+	const SortMode(this.compFunction);
+
+	final int Function(MenuEntry a, MenuEntry b) compFunction;
+
+	static int _alphaSort(MenuEntry a, MenuEntry b) {
+		if (a is EntryDirectory && b is EntryPanel) {
+			return -1;
+		} else if (a is EntryPanel && b is EntryDirectory) {
+			return 1;
+		}
+		
+		return a.displayName.compareTo(b.displayName);
+	}
+}
+
 /// Backend data structure that is used to represent an entry in the menu
 abstract class MenuEntry {
 	LocalSelectionMode? get mode;
 	void set mode(LocalSelectionMode? m);
+
+	String get displayName;
 
 	Future<FileSystemEntity> deleteFile();
 	Future<FileSystemEntity> moveTo(String destDirPath);
@@ -49,6 +69,16 @@ class SelectionMenuData {
 
 	void addDir(DirContainer d) {
 		menuItems.add(EntryDirectory(d, null));
+	}
+
+	void sort(SortMode sortMode, {bool reversed = false}) {
+		deselectAll();
+		
+		int multiplier = reversed ? -1 : 1;
+		
+		menuItems.sort((a,b) {
+			return sortMode.compFunction(a, b) * multiplier;
+		});
 	}
 
 	/// Remove every selected PanelData
