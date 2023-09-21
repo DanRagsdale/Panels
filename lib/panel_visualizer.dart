@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:panels/panel_data.dart';
 import 'package:panels/uw_check_controller.dart';
+import 'package:panels/uw_form.dart';
 
 import 'editor_page.dart';
 import 'uw_separator.dart';
@@ -31,7 +32,7 @@ enum WidgetButtons {
 	separator(icon: Icons.horizontal_rule, description: "Divider", factory: UWSeparatorFactory.new),
 
 	checkController(icon: Icons.clear_all_outlined, description: "Check Controller", factory: UWCheckControllerFactory.new),
-	form(icon: Icons.view_list_outlined, description: "Form", factory: UWTextFactory.new); // TODO create factory
+	form(icon: Icons.view_list_outlined, description: "Form", factory: UWFormFactory.new); // TODO create factory
 
 	const WidgetButtons({
 		required this.icon,
@@ -139,7 +140,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 				if (saveFlag) {
 					widgetPage.saveFile();
 					saveFlag = false;
-					print("Saving" + t.tick.toString());
+					//print("Saving" + t.tick.toString());
 				}
 			},
 		);

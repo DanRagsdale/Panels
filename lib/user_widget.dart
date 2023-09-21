@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:panels/panel_visualizer.dart';
 import 'package:panels/uw_check.dart';
 import 'package:panels/uw_check_controller.dart';
+import 'package:panels/uw_form.dart';
 import 'package:panels/uw_separator.dart';
 import 'package:panels/uw_text.dart';
 
@@ -30,6 +31,7 @@ abstract class UWFactory<T extends UserWidget> {
 		UWSeparatorFactory.id : UWSeparatorFactory.new,
 		UWCheckFactory.id : UWCheckFactory.new,
 		UWCheckControllerFactory.id : UWCheckControllerFactory.new,
+		UWFormFactory.id : UWFormFactory.new,
 	};
 
 	Map toJsonMap();
