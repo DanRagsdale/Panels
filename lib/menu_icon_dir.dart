@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:panels/main.dart';
 
+import 'io_tools.dart';
 import 'main_menu_data.dart';
 
 /// Backend data structure representing a directory icon in the menu
@@ -25,7 +26,6 @@ class EntryDirectory extends MenuEntry {
 	@override	
 	Future<FileSystemEntity> moveTo(String destDirpath) async {
 		var newPath = destDirpath + '/' + dir.fileName;
-		print(newPath);
 		return dir.dir.rename(newPath);
 	}
 }

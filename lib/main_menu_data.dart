@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:panels/main.dart';
-
+import 'io_tools.dart';
 import 'menu_icon_dir.dart';
 import 'menu_icon_panel.dart';
 import 'panel_data.dart';

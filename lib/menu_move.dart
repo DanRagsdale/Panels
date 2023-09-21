@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:panels/main_menu_data.dart';
-import 'package:path_provider/path_provider.dart';
 
+import 'io_tools.dart';
 import 'main.dart';
 
+/// Simple class allowing an int to be passed by reference
 class Counter {
 	int value;
 
@@ -21,7 +22,14 @@ class MoveNode {
 
 	MoveNode(this.dirCon, {this.depth = 0});
 
-	MoveNode? getIndex(Counter index) {
+	/// Return child (or this) MoveNode at the given index in the tree
+	/// Counts recursively, taking into account expanded and unexpanded children
+	/// Returns null if no MoveNode exists for the index
+	MoveNode? getIndex(int index) {
+		return this.getIndexCounter(Counter(index));
+	}
+
+	MoveNode? getIndexCounter(Counter index) {
 		if (index.value == 0) {
 			return this;
 		}
@@ -29,29 +37,18 @@ class MoveNode {
 			return null;
 		}
 
-		// TODO properly handle unpopulated list of ChildNodes
 		if (childNodes == null) {
 			return null;
 		}
 
 		for (var c in childNodes!) {
 			index.value -= 1;
-			var step = c.getIndex(index);
+			var step = c.getIndexCounter(index);
 			if (step != null) {
 				return step;
 			}
 		}
 		return null;
-	}
-}
-
-class MoveTree {
-	MoveNode rootNode;
-
-	MoveTree(this.rootNode);
-
-	MoveNode? getNode(int index) {
-		return rootNode.getIndex(Counter(index));
 	}
 }
 
@@ -66,7 +63,7 @@ class MenuMove extends StatefulWidget {
 
 class _StateMenuMove extends State<MenuMove> {
 
-	MoveTree? tree;
+	MoveNode? rootNode;
 
 	@override
 	void initState() {
@@ -75,12 +72,11 @@ class _StateMenuMove extends State<MenuMove> {
 	}
 
 	Future<void> buildTree() async {
-		MoveNode rootNode = MoveNode(await _getRootDir());
-		tree = MoveTree(rootNode);
-		List<MoveNode> children = await getChildren(rootNode);
+		rootNode = MoveNode(await getMainDir());
+		List<MoveNode> children = await getChildren(rootNode!);
 		setState(() {
-		  rootNode.childNodes = children;
-			rootNode.expanded = true;
+		  rootNode!.childNodes = children;
+			rootNode!.expanded = true;
 		});
 	}
 
@@ -89,6 +85,7 @@ class _StateMenuMove extends State<MenuMove> {
 	@override
 	Widget build(BuildContext context) {
 		return Container(
+			color: COLOR_BACKGROUND,
 			padding: EdgeInsets.all(4.0),
 			child: Column(
 				children: [
@@ -100,10 +97,10 @@ class _StateMenuMove extends State<MenuMove> {
 						//width: double.maxFinite,
 						child: ListView.builder(
 							itemBuilder: (context, index) {
-								if (tree == null) {
+								if (rootNode == null) {
 									return null;
 								}
-								MoveNode? node = tree!.getNode(index);
+								MoveNode? node = rootNode!.getIndex(index);
 								if (node == null) {
 									return null;
 								}
@@ -112,11 +109,11 @@ class _StateMenuMove extends State<MenuMove> {
 		
 								return Card(
 									margin: EdgeInsets.only(left: 8.0 * node.depth, top: 4.0, bottom: 4.0),
-									color: selected ? COLOR_BACKGROUND_HEAVY : Colors.white,
+									color: selected ? COLOR_MENU_HOT : COLOR_BACKGROUND_MID,
 									child: ListTile(
 										contentPadding: EdgeInsets.zero,
 										leading: Icon(Icons.folder),
-										title: Text(node.dirCon.displayName),
+										title: node.depth != 0 ? Text(node.dirCon.displayName) : Text("Home"),
 										trailing: IconButton(
 											icon: Icon(node.expanded ? Icons.expand_less : Icons.expand_more),
 											onPressed: () {
@@ -164,19 +161,8 @@ class _StateMenuMove extends State<MenuMove> {
 		);
 	}
 
-	// TODO eliminate duplicate IO Code with main menu	
-	Future<String> get _localPath async {
-		final directory = await getApplicationDocumentsDirectory();
-		return directory.path;
-	}
-
-	Future<DirContainer> _getRootDir() async {
-		final path = await _localPath;
-		Directory rawDir = await Directory('$path/note_panels').create(recursive: true);
-		return DirContainer(rawDir);
-	}
-
-	// Main IO functions
+	/// Return a list of child MoveNodes corresponding to child directories
+	/// Excludes directories that are selected to be moved
 	Future<List<MoveNode>> getChildren(MoveNode node) async {
 		List<MoveNode> children = [];
 		try {

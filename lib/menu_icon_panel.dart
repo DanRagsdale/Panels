@@ -29,7 +29,6 @@ class EntryPanel extends MenuEntry {
 		var path = panel.file.path;
 		var lastSeparator = path.lastIndexOf(Platform.pathSeparator);
 		var newPath = destDirPath + Platform.pathSeparator + path.substring(lastSeparator + 1);
-		print(newPath);
 		return panel.file.rename(newPath);
 	}
 }

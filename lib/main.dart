@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:panels/menu_icon_dir.dart';
 import 'package:panels/user_widget.dart';
 import 'package:panels/uw_text.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:panels/panel_data.dart';
 
+import 'io_tools.dart';
 import 'menu_icon_panel.dart';
 import 'editor_page.dart';
 import 'main_menu_data.dart';
@@ -55,35 +55,6 @@ class MainPage extends StatefulWidget {
 
 	@override
 	State<MainPage> createState() => _MainPageState();
-}
-
-/// Container holding a reference to a directory
-/// Used to allow in place renaming and moving of directories
-class DirContainer {
-	Directory dir;
-
-	DirContainer(this.dir);
-
-	String get path => dir.path;
-	String get fileName => dir.path.split('/').last;
-	String get displayName => fileName.split('-*-').last;
-
-	/// Moves the underlying directory to the new name and sets
-	/// the directory reference to the new location	
-	Future<void> inPlaceRename(String newDispName) async {
-		var oldPathList = dir.path.split('/');
-		var oldNameList = oldPathList.last.split('-*-');
-		
-		oldNameList.last = newDispName;
-
-		var newName = oldNameList.join('-*-');
-		oldPathList.last = newName;
-
-		var newPath = oldPathList.join('/');
-
-		var newDir = await dir.rename(newPath);
-		dir = newDir;
-	}
 }
 
 class _MainPageState extends State<MainPage> {
@@ -154,6 +125,9 @@ class _MainPageState extends State<MainPage> {
 					IconButton(
 						icon: Icon(Icons.move_up_outlined),
 						onPressed: () {
+							if (menuData.selectedCount == 0) {
+								return;
+							}
 							MenuMove menuMove = MenuMove(menuData);
 							showDialog<DirContainer?>(
 								context: context,
@@ -162,15 +136,13 @@ class _MainPageState extends State<MainPage> {
 									child: menuMove,
 								),
 							).then((value) async {
-								if (value != null && value != _activeDir?.path) {
+								if (value != null && value.path != _activeDir?.path) {
 									List<MenuEntry> selections = menuData.removeSelected();
 									setState(() {});
 									for (var s in selections) {
 										try {
-											print(value.path);
 											await s.moveTo(value.path);
 										} catch(e) {
-											print(e.toString());
 										}
 									}
 								}
@@ -344,16 +316,9 @@ class _MainPageState extends State<MainPage> {
 
 	// IO functions
 	// Helper Functions
-	Future<String> get _localPath async {
-		final directory = await getApplicationDocumentsDirectory();
-		return directory.path;
-	}
-
 	Future<DirContainer> _getActiveDir() async {
 		if (_activeDir == null) {
-			final path = await _localPath;
-			Directory rawDir = await Directory('$path/note_panels').create(recursive: true);
-			_activeDir = DirContainer(rawDir);
+			_activeDir = await getMainDir();
 		}
 		return _activeDir!;
 	}
