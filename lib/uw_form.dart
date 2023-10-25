@@ -111,7 +111,7 @@ class _UWFormState extends State<UWForm> {
 
 		if (widget.mode == Mode.view) {
 			return Container(
-				padding: EdgeInsets.only(left: 14, right: 8, top: 4, bottom: 4),
+				padding: EdgeInsets.only(left: 15, right: 9, top: 3, bottom: 3),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
 					//border: Border.all(
@@ -194,7 +194,8 @@ class _UWFormState extends State<UWForm> {
 				),
 			);
 		}
-		
+
+		// Edit Mode display	
 		return Container(
 			padding: EdgeInsets.only(left: 14, right: 8, top: 2, bottom: 2),
 			decoration: BoxDecoration(

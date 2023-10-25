@@ -71,9 +71,10 @@ class _UWTextState extends State<UWText> {
 			},
 		);
 
+		// View Mode display	
 		if (widget.mode == Mode.view) {
 			return Container(
-				padding: EdgeInsets.only(left: 14, right: 8, top: 2, bottom: 2),
+				padding: EdgeInsets.only(left: 15, right: 4, top: 3, bottom: 3),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
 					//border: Border.all(
@@ -84,9 +85,10 @@ class _UWTextState extends State<UWText> {
 				child: field,
 			);
 		}
-		
+
+		// Edit Mode display	
 		return Container(
-			padding: EdgeInsets.only(left: 14, right: 8, top: 2, bottom: 2),
+			padding: EdgeInsets.only(left: 14, right: 3, top: 2, bottom: 2),
 			decoration: BoxDecoration(
 				color: COLOR_BACKGROUND_MID,
 				border: Border.all(
@@ -95,29 +97,41 @@ class _UWTextState extends State<UWText> {
 				borderRadius: BorderRadius.circular(3),
 			),
 
-			child: Column(
-			  children: [
+			child: Stack(
+				children: [
+					field,
 					Row(
 						mainAxisAlignment: MainAxisAlignment.end,
 						children: [
-							IconButton(
-								icon: Icon(Icons.delete),
-								onPressed: (){
-									widget.controller.remove(widget.key!);
-								},
+							Container(
+								padding: EdgeInsets.all(3),
+								color: COLOR_BACKGROUND_MID.withAlpha(200),
+								child: IconButton(
+									icon: Icon(Icons.delete),
+									onPressed: (){
+										widget.controller.remove(widget.key!);
+									},
+								),
 							),
 							//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-							IconButton(
-								icon: Icon(Icons.add_task),
-								onPressed: (){
-									widget.controller.insertAfter(widget.key!, UWTextFactory(GlobalKey()));
-								},
+							Container(
+								color: COLOR_BACKGROUND_MID.withAlpha(200),
+								child: IconButton(
+									icon: Icon(Icons.add_task),
+									onPressed: (){
+										widget.controller.insertAfter(widget.key!, UWTextFactory(GlobalKey()));
+									},
+								),
 							),
 						],
 					),
-			    field,
-			  ],
+				],
 			),
+			//Column(
+			//  children: [
+			//    field,
+			//  ],
+			//),
 		);
 	}
 	

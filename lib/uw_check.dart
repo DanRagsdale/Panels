@@ -96,7 +96,7 @@ class _UWCheckState extends State<UWCheck> {
 		
 		if (widget.mode == Mode.view) {
 			return Container(
-				padding: EdgeInsets.all(3),
+				padding: EdgeInsets.all(4),
 				decoration: BoxDecoration(
 					color: COLOR_BACKGROUND_MID,
 					//border: Border.all(
