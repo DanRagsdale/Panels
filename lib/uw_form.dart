@@ -4,7 +4,6 @@ import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
 import 'main.dart';
-import 'editor_page.dart';
 
 class UWFormFactory extends UWFactory<UWForm> {
 	static final String id = 'form';

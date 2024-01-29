@@ -4,7 +4,6 @@ import 'package:panels/user_widget.dart';
 import 'package:panels/uw_check_controller.dart';
 
 import 'main.dart';
-import 'editor_page.dart';
 
 class UWCheckFactory extends UWFactory<UWCheck> {
 	static final String id = 'check';
@@ -123,13 +122,6 @@ class _UWCheckState extends State<UWCheck> {
 				children: [
 					box,
 					Expanded(child: field),
-					IconButton(
-						icon: Icon(Icons.delete),
-						onPressed: () {
-							widget.controller.remove(widget.key!);
-						},
-					),
-					//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
 					IconButton(
 						icon: Icon(Icons.add_task),
 						onPressed: (){

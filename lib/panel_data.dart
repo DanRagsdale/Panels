@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
-import 'editor_page.dart';
 import 'main.dart';
 
 /// The backend data structure used to represent and manipulate a NotePanel

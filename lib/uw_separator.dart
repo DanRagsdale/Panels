@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
-import 'editor_page.dart';
-
 class UWSeparatorFactory extends UWFactory<UWSeparator> {
 	static final String id = 'separator';
 
@@ -38,28 +36,23 @@ class UWSeparator extends UserWidget{
 class _UWSeparatorState extends State<UWSeparator> {
 	@override
 	Widget build(BuildContext context) {
-		List<Widget> items = [
-			Expanded(
-				child: Container(
-					margin: const EdgeInsets.all(8),
-					color: Colors.black,
-					height: 6.0,
-				),
-			),
-		];
-		if (widget.mode == Mode.edit) {
-			items.add(
-				IconButton(
-					icon: Icon(Icons.delete),
-					onPressed: () {
-						setState(() => widget.controller.remove(widget.key!));
-					},
-				),
+		var bar = Container(
+			margin: const EdgeInsets.all(8),
+			color: Colors.black,
+			height: 6.0,
+		);
+
+		if (widget.mode == Mode.view) {
+			return Expanded(
+				child: bar,
 			);
 		}
-
-		return Row(
-			children: items,
+		
+		return Expanded(
+			child: Container(
+				child: bar,
+				color: Colors.green,
+			),
 		);
 	}
 }

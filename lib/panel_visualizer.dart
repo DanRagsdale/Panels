@@ -5,23 +5,13 @@ import 'package:panels/panel_data.dart';
 import 'package:panels/uw_check_controller.dart';
 import 'package:panels/uw_form.dart';
 
-import 'editor_page.dart';
+import 'main.dart';
 import 'uw_separator.dart';
 import 'uw_check.dart';
 import 'uw_text.dart';
 import 'user_widget.dart';
 
-/// The widget that displays a NotePanel in its various configurations
-/// Also serves as a liason between the individual UserWidgets and the PanelData
-class PanelVisualizer extends StatefulWidget {
-	final PanelData initialPage;
-	final Mode mode;
-	
-	PanelVisualizer({required this.initialPage, required this.mode});
-
-	@override
-	State<StatefulWidget> createState() => PanelVisualizerState();
-}
+enum Mode {view, edit}
 
 /// Enum that is used for organizing and generating all of the buttons the user
 /// may use to add widgets in edit mode
@@ -68,6 +58,17 @@ enum WidgetButtons {
 			),
 		);
 	}
+}
+
+/// The widget that displays a NotePanel in its various configurations
+/// Also serves as a liason between the individual UserWidgets and the PanelData
+class PanelVisualizer extends StatefulWidget {
+	final PanelData initialPage;
+	
+	PanelVisualizer({required this.initialPage});
+
+	@override
+	State<StatefulWidget> createState() => PanelVisualizerState();
 }
 
 class PanelVisualizerState extends State<PanelVisualizer> {
@@ -125,12 +126,23 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 	}
 
 	late Timer saveTimer;
+	Mode mode = Mode.view;
+	
+	TextEditingController _titleController = TextEditingController();
+
 	// Flutter code
 	@override
 	void initState() {
 		super.initState();
 
 		widgetPage = widget.initialPage;
+		
+		//TODO prevent wasting time reloading if the page is already cached
+		widgetPage.readFile().then((_) {
+			setState(() {
+				_titleController.text = widget.initialPage.title;
+			});
+		});
 
 		saveTimer = Timer.periodic(
 			const Duration(
@@ -140,7 +152,6 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 				if (saveFlag) {
 					widgetPage.saveFile();
 					saveFlag = false;
-					//print("Saving" + t.tick.toString());
 				}
 			},
 		);
@@ -148,74 +159,143 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 
 	@override
 	Widget build(BuildContext context) {
-		// View Mode display
-		if(widget.mode == Mode.view) {
-			return ListView(
-				children: widgetPage.buildWidgetList(this, Mode.view),
+		_titleController.text = widget.initialPage.title;
+
+		var bottomBar = Row(
+				mainAxisAlignment: MainAxisAlignment.spaceBetween,
+				children: [
+					Expanded(
+						child: Row(
+							mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+							children: [
+								WidgetButtons.text.getIconButton(add),
+								WidgetButtons.check.getIconButton(add),
+								WidgetButtons.image.getIconButton(add),
+								WidgetButtons.separator.getIconButton(add),
+							],
+						),
+					),
+					PopupMenuButton(
+						icon: Icon(Icons.more_vert),
+						tooltip: "More Widgets",
+						offset: Offset(0.0, -120.0),
+
+						itemBuilder: (context) => [
+							WidgetButtons.checkController.getMenuItem(add),
+							WidgetButtons.form.getMenuItem(add),
+						],
+						//onSelected: (index) {
+						//	add(WidgetButtons.getFactoryByIndex(index));
+						//},
+					),
+				],
 			);
-		}
+
+		var content = mode == Mode.view ?
+			// View Mode display
+			ListView(
+				children: widgetPage.buildWidgetList(this, Mode.view).map(
+					(uw) {
+						return InkWell(
+							onLongPress: () {
+								setState(() {
+									mode = Mode.edit;
+								});
+							},
+							child: Stack(
+								children: [
+									uw,
+									Positioned(
+										right: 0,
+										top: 0,
+										bottom: 0,
+										width: 100.0,
+										child: AbsorbPointer(
+											//child: Container(color: Colors.red),
+										),
+									),
+								],
+							)
+						);
+					}).toList(),
+			) : 
+			// Edit Mode display
+			ReorderableListView(
+				//buildDefaultDragHandles: false,
+				onReorderStart: (index) {
+					// Needed to prevent freezing when the items are moved
+					FocusManager.instance.primaryFocus?.unfocus();
+				},
+				onReorder: (int oldIndex, int newIndex) {
+					setState(() { 
+						if (oldIndex < newIndex) {
+							// removing the item at oldIndex will shorten the list by 1.
+							newIndex -= 1;
+						}
+						var movedItem = widgetPage.removeAt(oldIndex);
+						widgetPage.insert(newIndex, movedItem);
+					});  
+				},
+				children: widgetPage.buildWidgetList(this, Mode.edit),
+			);
+		var topBar = mode == Mode.view ? AppBar(
+			backgroundColor: COLOR_MENU_BG,
+			foregroundColor: COLOR_TEXT,
+			title: TextField(
+				decoration: null,
+				controller: _titleController,
+				style: TextStyle(fontWeight: FontWeight.bold),
+				onChanged: (value) => widget.initialPage.title = value,
+				onTap: () {
+					if (_titleController.text == DEFAULT_NOTE_TITLE) {
+						_titleController.text = '';
+					}
+				},
+			),
+		) : AppBar(
+			backgroundColor: COLOR_MENU_BG,
+			foregroundColor: COLOR_TEXT,
+			leading: IconButton(
+				icon: Icon(Icons.close_outlined),
+				onPressed: () {
+					setState(() {
+						mode = Mode.view;
+					});
+				},
+			),
+			actions: [
+				IconButton(
+					icon: Icon(Icons.delete),
+					onPressed: () {
+						//deleteSelected().then((value) {
+						//	setState(() {});
+						//});
+					},
+				),
+			],	
+		);
+
+		return Scaffold(
+			appBar: topBar,
+			body: Container(
+				color: COLOR_BACKGROUND,
+				child: content,
+			),
+			bottomNavigationBar: bottomBar,
+		);
+		
+
+		// View Mode display
 
 		// Edit Mode display
-		var moveableList = ReorderableListView(
-			//buildDefaultDragHandles: false,
-			onReorderStart: (index) {
-				// Needed to prevent freezing when the items are moved
-				FocusManager.instance.primaryFocus?.unfocus();
-			},
-			onReorder: (int oldIndex, int newIndex) {
-				setState(() { 
-					if (oldIndex < newIndex) {
-						// removing the item at oldIndex will shorten the list by 1.
-						newIndex -= 1;
-					}
-					var movedItem = widgetPage.removeAt(oldIndex);
-					widgetPage.insert(newIndex, movedItem);
-				});  
-			},
-			children: widgetPage.buildWidgetList(this, Mode.edit),
-		);
-
-		return Column(
-			children: [
-				Expanded(
-					child: moveableList,
-				),
-				Row(
-					mainAxisAlignment: MainAxisAlignment.spaceBetween,
-					children: [
-						Expanded(
-							child: Row(
-								mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-								children: [
-									WidgetButtons.text.getIconButton(add),
-									WidgetButtons.check.getIconButton(add),
-									WidgetButtons.image.getIconButton(add),
-									WidgetButtons.separator.getIconButton(add),
-								],
-							),
-						),
-						PopupMenuButton(
-							icon: Icon(Icons.more_vert),
-							tooltip: "More Widgets",
-							offset: Offset(0.0, -120.0),
-
-							itemBuilder: (context) => [
-								WidgetButtons.checkController.getMenuItem(add),
-								WidgetButtons.form.getMenuItem(add),
-							],
-							//onSelected: (index) {
-							//	add(WidgetButtons.getFactoryByIndex(index));
-							//},
-						),
-					],
-				),
-			],
-		);
 	}
 	
 	@override
 	void dispose() {
-		super.dispose();
+		widget.initialPage.saveFile();
+		_titleController.dispose();
 		saveTimer.cancel();
+
+		super.dispose();
 	}
 }

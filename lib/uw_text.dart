@@ -3,7 +3,6 @@ import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
 import 'main.dart';
-import 'editor_page.dart';
 
 class UWTextFactory extends UWFactory<UWText> {
 	static final String id = 'text';
@@ -100,31 +99,15 @@ class _UWTextState extends State<UWText> {
 			child: Stack(
 				children: [
 					field,
-					Row(
-						mainAxisAlignment: MainAxisAlignment.end,
-						children: [
-							Container(
-								padding: EdgeInsets.all(3),
-								color: COLOR_BACKGROUND_MID.withAlpha(200),
-								child: IconButton(
-									icon: Icon(Icons.delete),
-									onPressed: (){
-										widget.controller.remove(widget.key!);
-									},
-								),
-							),
-							//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-							Container(
-								color: COLOR_BACKGROUND_MID.withAlpha(200),
-								child: IconButton(
-									icon: Icon(Icons.add_task),
-									onPressed: (){
-										widget.controller.insertAfter(widget.key!, UWTextFactory(GlobalKey()));
-									},
-								),
-							),
-						],
-					),
+					Positioned(
+						right: 0,
+						child: IconButton(
+							icon: Icon(Icons.add_task),
+							onPressed: (){
+								widget.controller.insertAfter(widget.key!, UWTextFactory(GlobalKey()));
+							},
+						),
+					)
 				],
 			),
 			//Column(

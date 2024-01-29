@@ -3,7 +3,6 @@ import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
 import 'main.dart';
-import 'editor_page.dart';
 
 class MessageUncheck extends WidgetMessage {}
 
@@ -119,20 +118,6 @@ class _UWCheckControllerState extends State<UWCheckController> {
 							);
 						}).toList(),
 					),
-					Spacer(),
-
-					IconButton(
-						icon: Icon(Icons.delete),
-						onPressed: () {
-							widget.controller.remove(widget.key!);
-						},
-					),
-					//IconButton(
-					//	icon: Icon(Icons.add_task),
-					//	onPressed: (){
-					//		widget.controller.insertAfter(widget.key!, UWCheckControllerFactory(GlobalKey()));
-					//	},
-					//),
 				],
 			),
 		);

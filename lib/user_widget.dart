@@ -6,8 +6,6 @@ import 'package:panels/uw_form.dart';
 import 'package:panels/uw_separator.dart';
 import 'package:panels/uw_text.dart';
 
-import 'editor_page.dart';
-
 /// The backend data structure used to represent a single UserWidget within a NotePanel
 /// Stores all persistent information associated with a UserWidget,
 /// and can generate the corresponding flutter widget when needed

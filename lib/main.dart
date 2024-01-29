@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:panels/menu_icon_dir.dart';
+import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 import 'package:panels/uw_text.dart';
 
@@ -10,7 +11,6 @@ import 'package:panels/panel_data.dart';
 
 import 'io_tools.dart';
 import 'menu_icon_panel.dart';
-import 'editor_page.dart';
 import 'main_menu_data.dart';
 import 'menu_move.dart';
 
@@ -253,7 +253,7 @@ class _MainPageState extends State<MainPage> {
 									if (childData is EntryPanel) {
 										Navigator.of(context).push(
 											MaterialPageRoute(
-												builder: (context) => EditorPage(initialPage: childData.panel),
+												builder: (context) => PanelVisualizer(initialPage: childData.panel),
 											),
 										).then((value) {
 												setState(() {
