@@ -14,7 +14,7 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 	UWCheckFactory(Key key) : super(key);
 
 	@override
-	UWCheck build(PanelVisualizerState page, Mode mode) {
+	UWCheck build(PanelVisualizerState page, Mode mode, bool selected) {
 		return UWCheck(page, mode, this, key);
 	}
 

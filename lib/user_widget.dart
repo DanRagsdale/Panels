@@ -14,14 +14,13 @@ abstract class UWFactory<T extends UserWidget> {
 	final Key key;
 	UWFactory(this.key);
 
-	T build(PanelVisualizerState page, Mode mode);
+	T build(PanelVisualizerState page, Mode mode, bool selected);
 
 	/// Receive a WidgetMessage
 	/// Return true if the message should continue propagating
 	bool receiveMessage(WidgetMessage message) => false;
 
 	String previewString();
-
 
 	// Serialization code
 	static Map idToFactory = {

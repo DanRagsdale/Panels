@@ -13,7 +13,7 @@ class UWFormFactory extends UWFactory<UWForm> {
 	UWFormFactory(Key key) : super(key);
 
 	@override
-	UWForm build(PanelVisualizerState page, Mode mode) {
+	UWForm build(PanelVisualizerState page, Mode mode, bool selected) {
 		return UWForm(page, mode, this, key);
 	}
 	

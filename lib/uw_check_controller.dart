@@ -23,7 +23,7 @@ class UWCheckControllerFactory extends UWFactory<UWCheckController> {
 	ControlMode controlMode = ControlMode.all;
 
 	@override
-	UWCheckController build(PanelVisualizerState page, Mode mode) {
+	UWCheckController build(PanelVisualizerState page, Mode mode, bool selected) {
 		return UWCheckController(page, mode, this, key);
 	}
 

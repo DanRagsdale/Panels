@@ -193,34 +193,36 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 
 		var content = mode == Mode.view ?
 			// View Mode display
-			ListView(
-				children: widgetPage.buildWidgetList(this, Mode.view).map(
-					(uw) {
-						return InkWell(
-							onLongPress: () {
-								setState(() {
-									mode = Mode.edit;
-								});
-							},
-							child: Stack(
-								children: [
-									uw,
-									Positioned(
-										right: 0,
-										top: 0,
-										bottom: 0,
-										width: 100.0,
-										child: AbsorbPointer(
-											//child: Container(color: Colors.red),
-										),
-									),
-								],
-							)
-						);
-					}).toList(),
+			ListView.builder(
+				itemBuilder: (context, index) {
+					UserWidget? uw = widgetPage.buildWidget(this, Mode.view, index);
+					if (uw == null) {
+						return null;
+					}
+					return InkWell(
+						onLongPress: () {
+							setState(() {
+								mode = Mode.edit;
+								widgetPage.setSelection(index, true);
+							});
+						},
+						child: Stack(
+							children: [
+								uw,
+								Positioned(
+									right: 0,
+									top: 0,
+									bottom: 0,
+									width: 100.0,
+									child: AbsorbPointer(),
+								),
+							],
+						)
+					);
+				},
 			) : 
 			// Edit Mode display
-			ReorderableListView(
+			ReorderableListView.builder(
 				//buildDefaultDragHandles: false,
 				onReorderStart: (index) {
 					// Needed to prevent freezing when the items are moved
@@ -236,51 +238,75 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 						widgetPage.insert(newIndex, movedItem);
 					});  
 				},
-				children: widgetPage.buildWidgetList(this, Mode.edit),
+				itemBuilder: (context, index) {
+					UserWidget uw = widgetPage.buildWidget(this, Mode.edit, index)!;
+					return uw;
+					//return InkWell(
+					//	onTap: () {
+					//		setState(() {
+					//			widgetPage.setSelection(index, true);
+					//		});
+					//	},
+					//	child: Stack(
+					//		children: [
+					//			uw,
+					//			Positioned(
+					//				right: 0,
+					//				top: 0,
+					//				bottom: 0,
+					//				width: 100.0,
+					//				child: AbsorbPointer(),
+					//			),
+					//		],
+					//	)
+					//);
+				},
+				itemCount: widgetPage.length,
 			);
-		var topBar = mode == Mode.view ? AppBar(
-			backgroundColor: COLOR_MENU_BG,
-			foregroundColor: COLOR_TEXT,
-			title: TextField(
-				decoration: null,
-				controller: _titleController,
-				style: TextStyle(fontWeight: FontWeight.bold),
-				onChanged: (value) => widget.initialPage.title = value,
-				onTap: () {
-					if (_titleController.text == DEFAULT_NOTE_TITLE) {
-						_titleController.text = '';
-					}
-				},
-			),
-		) : AppBar(
-			backgroundColor: COLOR_MENU_BG,
-			foregroundColor: COLOR_TEXT,
-			leading: IconButton(
-				icon: Icon(Icons.close_outlined),
-				onPressed: () {
-					setState(() {
-						mode = Mode.view;
-					});
-				},
-			),
-			actions: [
-				IconButton(
-					icon: Icon(Icons.delete),
-					onPressed: () {
-						//deleteSelected().then((value) {
-						//	setState(() {});
-						//});
+		var topBar = mode == Mode.view ? 
+			AppBar(
+				backgroundColor: COLOR_MENU_BG,
+				foregroundColor: COLOR_TEXT,
+				title: TextField(
+					decoration: null,
+					controller: _titleController,
+					style: TextStyle(fontWeight: FontWeight.bold),
+					onChanged: (value) => widget.initialPage.title = value,
+					onTap: () {
+						if (_titleController.text == DEFAULT_NOTE_TITLE) {
+							_titleController.text = '';
+						}
 					},
 				),
-			],	
-		);
+			) : 
+			AppBar(
+				backgroundColor: COLOR_MENU_BG,
+				foregroundColor: COLOR_TEXT,
+				leading: IconButton(
+					icon: Icon(Icons.close_outlined),
+					onPressed: () {
+						setState(() {
+							mode = Mode.view;
+							widgetPage.clearSelections();
+						});
+					},
+				),
+				actions: [
+					IconButton(
+						icon: Icon(Icons.delete),
+						onPressed: () {
+							setState(() {
+							  widgetPage.deleteSelected();
+								mode = Mode.view;
+							});
+						},
+					),
+				],	
+			);
 
 		return Scaffold(
 			appBar: topBar,
-			body: Container(
-				color: COLOR_BACKGROUND,
-				child: content,
-			),
+			body: content,
 			bottomNavigationBar: bottomBar,
 		);
 		

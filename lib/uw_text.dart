@@ -12,7 +12,7 @@ class UWTextFactory extends UWFactory<UWText> {
 	UWTextFactory(Key key) : super(key);
 
 	@override
-	UWText build(PanelVisualizerState page, Mode mode) {
+	UWText build(PanelVisualizerState page, Mode mode, bool selected) {
 		return UWText(page, mode, this, key);
 	}
 	

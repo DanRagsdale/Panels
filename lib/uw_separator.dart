@@ -8,8 +8,8 @@ class UWSeparatorFactory extends UWFactory<UWSeparator> {
 	UWSeparatorFactory(Key key) : super(key);
 
 	@override
-	UWSeparator build(PanelVisualizerState page, Mode mode) {
-		return UWSeparator(page, mode, key);
+	UWSeparator build(PanelVisualizerState page, Mode mode, bool selected) {
+		return UWSeparator(page, mode, selected, key);
 	}
 	
 	@override	
@@ -27,7 +27,9 @@ class UWSeparatorFactory extends UWFactory<UWSeparator> {
 }
 
 class UWSeparator extends UserWidget{
-  UWSeparator(super.widgetController, super.mode, Key key) : super(key: key);
+	final bool selected;
+
+  UWSeparator(super.widgetController, super.mode, this.selected, Key key) : super(key: key);
 
 	@override
 	State<UWSeparator> createState() => _UWSeparatorState();
@@ -40,19 +42,16 @@ class _UWSeparatorState extends State<UWSeparator> {
 			margin: const EdgeInsets.all(8),
 			color: Colors.black,
 			height: 6.0,
+			width: double.infinity,
 		);
 
-		if (widget.mode == Mode.view) {
-			return Expanded(
-				child: bar,
-			);
+		if (!widget.selected) {
+			return bar;
 		}
 		
-		return Expanded(
-			child: Container(
-				child: bar,
-				color: Colors.green,
-			),
+		return Container(
+			child: bar,
+			color: Colors.green,
 		);
 	}
 }
