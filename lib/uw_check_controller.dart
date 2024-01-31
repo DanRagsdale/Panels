@@ -63,7 +63,7 @@ class _UWCheckControllerState extends State<UWCheckController> {
 			style: ButtonStyle(
 				backgroundColor: MaterialStateColor.resolveWith((states) => COLOR_MENU_COLD),
 			),
- 			child: Text("Uncheck Completed"),
+ 			child: widget.factory.controlMode == ControlMode.all ? Text("Uncheck All") : Text("Uncheck Section"),
 			onPressed: () {
 				if (widget.factory.controlMode == ControlMode.all) {
 					widget.controller.broadcastMessage(MessageUncheck());
