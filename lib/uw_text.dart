@@ -13,7 +13,7 @@ class UWTextFactory extends UWFactory<UWText> {
 
 	@override
 	UWText build(PanelVisualizerState page, Mode mode, bool selected) {
-		return UWText(page, mode, this, key);
+		return UWText(page, mode, this, selected, key);
 	}
 	
 	@override	
@@ -35,8 +35,9 @@ class UWTextFactory extends UWFactory<UWText> {
 
 class UWText extends UserWidget{
 	final UWTextFactory factory;
+	final bool selected;
 
-  UWText(super.widgetController, super.mode, this.factory, Key key) : super(key: key);
+  UWText(super.widgetController, super.mode, this.factory, this.selected, Key key) : super(key: key);
 
 	@override
 	State<StatefulWidget> createState() => _UWTextState();
@@ -89,7 +90,7 @@ class _UWTextState extends State<UWText> {
 		return Container(
 			padding: EdgeInsets.only(left: 14, right: 3, top: 2, bottom: 2),
 			decoration: BoxDecoration(
-				color: COLOR_BACKGROUND_MID,
+				color: widget.selected ? COLOR_BACKGROUND_HEAVY : COLOR_BACKGROUND_MID,
 				border: Border.all(
 					width: 1,
 				),

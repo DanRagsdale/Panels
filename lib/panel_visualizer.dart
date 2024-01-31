@@ -74,57 +74,6 @@ class PanelVisualizer extends StatefulWidget {
 class PanelVisualizerState extends State<PanelVisualizer> {
 	late PanelData widgetPage;
 
-	// These functions update the backend AND force the list to update its display 
-	void add(UWFactory w) {
-		setState(() => widgetPage.add(w));
-		requestSave();
-	}
-	void insert(int index, UWFactory w) {
-		setState(() => widgetPage.insert(index, w));
-		requestSave();
-	}
-	void insertAfter(Key k, UWFactory w) {
-		setState(() => widgetPage.insertAfter(k, w));
-		requestSave();
-	}
-	void remove(Key k) {
-		setState(() => widgetPage.remove(k));
-		requestSave();
-	}
-
-	/// Sends the message to every single widget factory,
-	/// including the one which sends the message
-	void broadcastMessage(WidgetMessage message) {
-		for (var w in widgetPage.widgetFactories) {
-			w.receiveMessage(message);
-		}
-		setState(() {});
-	}
-	
-	/// Send the message to every widget factory after initial, until
-	/// receive message returns false
-	void propagateMessage(UWFactory initial, WidgetMessage message) {
-		int index = widgetPage.widgetFactories.indexOf(initial);
-
-		if (index != -1) {
-			while (++index < widgetPage.length && widgetPage.widgetFactories[index].receiveMessage(message));
-			setState(() {});
-		}
-	}
-
-	/// Request to save the active NotePanel
-	/// By default, the file will be saved at the next periodic save interval
-	/// If the immediate flag is set, the file will be saved without waiting 
-	bool saveFlag = false;
-	void requestSave({bool immediate = false}) {
-		if (immediate) {
-			saveFlag = false;
-			widgetPage.saveFile();
-		} else {
-			saveFlag = true;
-		}
-	}
-
 	late Timer saveTimer;
 	Mode mode = Mode.view;
 	
@@ -240,26 +189,32 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 				},
 				itemBuilder: (context, index) {
 					UserWidget uw = widgetPage.buildWidget(this, Mode.edit, index)!;
-					return uw;
-					//return InkWell(
-					//	onTap: () {
-					//		setState(() {
-					//			widgetPage.setSelection(index, true);
-					//		});
-					//	},
-					//	child: Stack(
-					//		children: [
-					//			uw,
-					//			Positioned(
-					//				right: 0,
-					//				top: 0,
-					//				bottom: 0,
-					//				width: 100.0,
-					//				child: AbsorbPointer(),
-					//			),
-					//		],
-					//	)
-					//);
+					return InkWell(
+						key: Key(uw.key.toString() + "InkWell"),
+						onTap: () {
+							setState(() {
+								widgetPage.toggleSelection(index);
+							});
+						},
+						child: Stack(
+							alignment: Alignment.centerRight,
+							children: [
+								uw,
+								// the Ignore Pointer is offset from the right to allow widgets
+								// which have an add widget button to function properly.
+								// This is a bad solution.
+								// TODO create a more robust solution allowing user to select widgets without interfering with the add widget button
+								Positioned(
+									right: 50,
+									top: 0,
+									bottom: 0,
+									width: 100.0,
+									child: AbsorbPointer(),
+								),
+								//null,
+							],
+						)
+					);
 				},
 				itemCount: widgetPage.length,
 			);
@@ -309,11 +264,6 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 			body: content,
 			bottomNavigationBar: bottomBar,
 		);
-		
-
-		// View Mode display
-
-		// Edit Mode display
 	}
 	
 	@override
@@ -324,4 +274,57 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 
 		super.dispose();
 	}
+	
+	// Util functions
+	// These functions update the backend AND force the list to update its display 
+	void add(UWFactory w) {
+		setState(() => widgetPage.add(w));
+		requestSave();
+	}
+	void insert(int index, UWFactory w) {
+		setState(() => widgetPage.insert(index, w));
+		requestSave();
+	}
+	void insertAfter(Key k, UWFactory w) {
+		setState(() => widgetPage.insertAfter(k, w));
+		requestSave();
+	}
+	void remove(Key k) {
+		setState(() => widgetPage.remove(k));
+		requestSave();
+	}
+
+	/// Sends the message to every single widget factory,
+	/// including the one which sends the message
+	void broadcastMessage(WidgetMessage message) {
+		for (var w in widgetPage.widgetFactories) {
+			w.receiveMessage(message);
+		}
+		setState(() {});
+	}
+	
+	/// Send the message to every widget factory after initial, until
+	/// receive message returns false
+	void propagateMessage(UWFactory initial, WidgetMessage message) {
+		int index = widgetPage.widgetFactories.indexOf(initial);
+
+		if (index != -1) {
+			while (++index < widgetPage.length && widgetPage.widgetFactories[index].receiveMessage(message));
+			setState(() {});
+		}
+	}
+
+	/// Request to save the active NotePanel
+	/// By default, the file will be saved at the next periodic save interval
+	/// If the immediate flag is set, the file will be saved without waiting 
+	bool saveFlag = false;
+	void requestSave({bool immediate = false}) {
+		if (immediate) {
+			saveFlag = false;
+			widgetPage.saveFile();
+		} else {
+			saveFlag = true;
+		}
+	}
+
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panels/main.dart';
 import 'package:panels/panel_visualizer.dart';
 import 'package:panels/user_widget.dart';
 
@@ -51,7 +52,7 @@ class _UWSeparatorState extends State<UWSeparator> {
 		
 		return Container(
 			child: bar,
-			color: Colors.green,
+			color: COLOR_BACKGROUND_HEAVY,
 		);
 	}
 }

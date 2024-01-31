@@ -15,7 +15,7 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 
 	@override
 	UWCheck build(PanelVisualizerState page, Mode mode, bool selected) {
-		return UWCheck(page, mode, this, key);
+		return UWCheck(page, mode, this, selected, key);
 	}
 
 	@override	
@@ -52,8 +52,9 @@ class UWCheckFactory extends UWFactory<UWCheck> {
 
 class UWCheck extends UserWidget {
 	final UWCheckFactory factory;
+	final bool selected;
 
-  UWCheck(super.widgetController, super.mode, this.factory, Key key) : super(key: key);
+  UWCheck(super.widgetController, super.mode, this.factory, this.selected, Key key) : super(key: key);
 
 	@override
 	State<StatefulWidget> createState() => _UWCheckState();
@@ -110,7 +111,7 @@ class _UWCheckState extends State<UWCheck> {
 		return Container(
 			padding: EdgeInsets.all(3),
 			decoration: BoxDecoration(
-				color: COLOR_BACKGROUND_MID,
+				color: widget.selected ? COLOR_BACKGROUND_HEAVY : COLOR_BACKGROUND_MID,
 				border: Border.all(
 					width: 1,
 				),
