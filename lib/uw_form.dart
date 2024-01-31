@@ -8,105 +8,82 @@ import 'main.dart';
 class UWFormFactory extends UWFactory<UWForm> {
 	static final String id = 'form';
 
-	List<String> items = [];
+	String text = "";
 
 	UWFormFactory(Key key) : super(key);
 
 	@override
 	UWForm build(PanelVisualizerState page, Mode mode, bool selected) {
-		return UWForm(page, mode, this, key);
+		return UWForm(page, mode, this, selected, key);
 	}
 	
 	@override	
 	String previewString() {
-		String output = "";
-		for (var s in items) {
-			output += s + '\n';
-		}
-		return output;
+		return text;
 	}
 	
 	@override
 	Map toJsonMap() {
 		return {
 			'id' : id,
-			'items' : items,
+			'body' : text,
 		};
 	}
 
 	@override
 	void buildFromJsonMap(Map m) {
-		for (var s in m['items']) {
-			items.add(s);
-		}
+		text = m['body'];
 	}
 }
 
 class UWForm extends UserWidget{
 	final UWFormFactory factory;
+	final bool selected;
 
-  UWForm(super.widgetController, super.mode, this.factory, Key key) : super(key: key);
+  UWForm(super.widgetController, super.mode, this.factory, this.selected, Key key) : super(key: key);
 
 	@override
 	State<StatefulWidget> createState() => _UWFormState();
 }
 
 class _UWFormState extends State<UWForm> {
-	List<TextEditingController> _textControllers = [];
+	TextEditingController _textController = TextEditingController();
 
 	@override
 	void initState() {
 		super.initState();
-
-		if (widget.factory.items.length > 0) {
-			for (var s in widget.factory.items) {
-				_textControllers.add(TextEditingController(text: s));
-			}
-		} else {
-			addRow();
-			addRow();
-		}
-	}
-
-	void addRow() {
-		_textControllers.add(TextEditingController());
-		widget.factory.items.add("");
-	}
-
-	void insertAfter(int index) {
-		_textControllers.insert(index, TextEditingController());
-		widget.factory.items.insert(index, "");
-	}
-	
-	void removeRow(int index) {
-		_textControllers.removeAt(index);
-		widget.factory.items.removeAt(index);
+		_textController.text = widget.factory.text;
 	}
 
 	@override
 	Widget build(BuildContext context) {
-		List<TextField> fields = [];
+		TextField field = TextField(
+			decoration: InputDecoration(
+				hintText: 'This is a form!',
+			),
+			controller: _textController,
+			onChanged: (value) {
+			  widget.factory.text = value;
+				widget.controller.requestSave();
+			},
+		);
 
-		for (int i = 0; i < _textControllers.length; i++) {
-			var tc = _textControllers[i];
-			fields.add(
-				TextField(
-					decoration: InputDecoration(
-						//border: InputBorder.none,
-						hintText: 'This is a form!',
-					),
-					//keyboardType: TextInputType.multiline,
-					controller: tc,
-					style: TextStyle(fontWeight: FontWeight.bold),
-					minLines: 1,
-					maxLines: 1024,
-					onChanged: (value) {
-					  widget.factory.items[i] = value;
-						widget.controller.requestSave();
+		var content = Row(
+			children: [
+				Expanded(
+					child:field,
+				),
+				IconButton(
+					icon: Icon(Icons.copy),
+					onPressed: () async {
+						var controller = field.controller;
+						if (controller != null) {
+							await Clipboard.setData(ClipboardData(text: controller.text));
+						}
 					},
 				),
-			);
-		}
+			],
+		);
 
 		if (widget.mode == Mode.view) {
 			return Container(
@@ -118,104 +95,25 @@ class _UWFormState extends State<UWForm> {
 					//),
 					borderRadius: BorderRadius.circular(3),
 				),
-				child: Column(
-					//children: fields,
-					children: fields.map((f) {
-						return Stack(
-							alignment: Alignment.centerRight,
-							children: [
-								f,
-								IconButton(
-									icon: Icon(Icons.copy),
-									onPressed: () async {
-										var controller = f.controller;
-										if (controller != null) {
-											await Clipboard.setData(ClipboardData(text: controller.text));
-										}
-									},
-								),
-							],
-						);
-					}).toList(),
-				),
+				child: content,
 			);
 		}
-
-		List<Widget> editWidgets = [
-			Row(
-				mainAxisAlignment: MainAxisAlignment.end,
-				children: [
-					IconButton(
-						icon: Icon(Icons.delete),
-						onPressed: (){
-							widget.controller.remove(widget.key!);
-						},
+			return Container(
+				padding: EdgeInsets.only(left: 14, right: 8, top: 2, bottom: 2),
+				decoration: BoxDecoration(
+					color: widget.selected ? COLOR_BACKGROUND_HEAVY : COLOR_BACKGROUND_MID,
+					border: Border.all(
+						width: 1,
 					),
-					//IconButton(onPressed: (){}, icon: Icon(Icons.done)),
-					IconButton(
-						icon: Icon(Icons.add_task),
-						onPressed: (){
-							widget.controller.insertAfter(widget.key!, UWFormFactory(GlobalKey()));
-						},
-					),
-				],
-			),
-		];
-
-		for (int i = 0; i < fields.length; i++) {
-			editWidgets.add(
-				Stack(
-					alignment: Alignment.centerRight,
-					children: [
-						fields[i],
-						Row(
-							mainAxisAlignment: MainAxisAlignment.end,
-							children: [
-								IconButton(
-									icon: Icon(Icons.add),
-									onPressed: (){
-										setState(() {
-											insertAfter(i+1);
-										});
-									},
-								),
-								IconButton(
-									icon: Icon(Icons.remove),
-									onPressed: (){
-										setState(() {
-											removeRow(i);
-										});
-									},
-								),
-							],
-						),
-					],
+					borderRadius: BorderRadius.circular(3),
 				),
+				child: content,
 			);
 		}
-
-		// Edit Mode display	
-		return Container(
-			padding: EdgeInsets.only(left: 14, right: 8, top: 2, bottom: 2),
-			decoration: BoxDecoration(
-				color: COLOR_BACKGROUND_MID,
-				border: Border.all(
-					width: 1,
-				),
-				borderRadius: BorderRadius.circular(3),
-			),
-
-			child: Column(
-			  children: editWidgets,
-			),
-		);
-	}
 	
 	@override
 	void dispose() {
-		for (var tc in _textControllers) {
-			tc.dispose();
-		}
+		_textController.dispose();
 		super.dispose();
 	}
 }

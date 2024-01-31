@@ -159,7 +159,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 							children: [
 								uw,
 								Positioned(
-									right: 0,
+									right: 40,
 									top: 0,
 									bottom: 0,
 									width: 100.0,
