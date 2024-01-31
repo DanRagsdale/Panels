@@ -16,8 +16,11 @@ class WidgetEntry {
 
 /// The backend data structure used to represent and manipulate a NotePanel
 class PanelData {
+	/// The title of this NotePanel, as is dispalyed at the top of the UI
 	String title;
+	/// The list of user widgets in this NotePanel
 	List<WidgetEntry> widgetEntries;
+	/// The underlying file which represents this NotePanel
 	File file;
 
 	PanelData._(this.title, this.file, List<UWFactory> factories) : this.widgetEntries = factories.map((e) => WidgetEntry(e, false)).toList();
@@ -126,8 +129,18 @@ class PanelData {
 		return output;
 	}
 
-	/// The primary build function used to convert the data structure into
-	/// a list of displayable widgets
+	/// The primary build function used to create displayable widgets from the backend data structure.
+	/// Return the user widget at the given index for the given mode.
+	/// Returns null if the index is out of range
+	UserWidget? buildWidget(PanelVisualizerState controller, Mode mode, int index) {
+		if (index >= this.length) {
+			return null;
+		}
+		var w = widgetEntries[index];
+		return w.uw.build(controller, mode, w.selected);
+	}
+
+	/// Generate all widgets and return them as a list	
 	List<UserWidget> buildWidgetList(PanelVisualizerState controller, Mode mode) {
 		List<UserWidget> outputList = [];
 
@@ -136,13 +149,5 @@ class PanelData {
 		}
 
 		return outputList;
-	}
-
-	UserWidget? buildWidget(PanelVisualizerState controller, Mode mode, int index) {
-		if (index >= this.length) {
-			return null;
-		}
-		var w = widgetEntries[index];
-		return w.uw.build(controller, mode, w.selected);
 	}
 }

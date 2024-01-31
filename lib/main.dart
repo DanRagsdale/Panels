@@ -178,18 +178,6 @@ class _MainPageState extends State<MainPage> {
 								child: const Text('Panels'),
 							),
 						),
-						//ListTile(
-						//	title: Row(
-						//		children: [
-						//			Icon(Icons.home),
-						//			SizedBox(
-						//				width: 10,
-						//			),
-						//			Text('Home')
-						//		],
-						//	),
-						//	onTap: () {},
-						//),
 						ListTile(
 							title: Row(
 								children: [
@@ -328,6 +316,9 @@ class _MainPageState extends State<MainPage> {
 	}
 
 	// Main IO functions
+
+	/// Read the files and folders in the active directory, and add them to the
+	/// menuData object
 	Future<void> readFiles() async {
 		setState(() {
 			menuData = SelectionMenuData();
@@ -354,6 +345,7 @@ class _MainPageState extends State<MainPage> {
 		} catch (e) {}
 	}
 
+	/// Create a new note in the active directory
 	Future<void> newNote({List<UWFactory> factories = const []}) async {
 		DirContainer dir = await _getActiveDir();
 		final name = "panel" + DateTime.now().millisecondsSinceEpoch.toString() + ".json";
@@ -366,6 +358,7 @@ class _MainPageState extends State<MainPage> {
 		});
 	}
 	
+	/// Create a new folder in the active directory
 	Future<void> newDir() async {
 		DirContainer dir = await _getActiveDir();
 		final name = "dir" + DateTime.now().millisecondsSinceEpoch.toString() + "-*-" + DEFAULT_FOLDER_TITLE;

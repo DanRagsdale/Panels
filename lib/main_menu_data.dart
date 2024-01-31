@@ -32,6 +32,7 @@ enum SortMode {
 
 	final int Function(MenuEntry a, MenuEntry b) compFunction;
 
+	/// Sort notes and folders alphabetically, but always prioritizing folders
 	static int _alphaSort(MenuEntry a, MenuEntry b) {
 		if (a is EntryDirectory && b is EntryPanel) {
 			return -1;

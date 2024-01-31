@@ -6,52 +6,8 @@ import 'package:panels/main_menu_data.dart';
 import 'io_tools.dart';
 import 'main.dart';
 
-/// Simple class allowing an int to be passed by reference
-class Counter {
-	int value;
-
-	Counter(this.value);
-}
-
-class MoveNode {
-	bool expanded = false;
-	List<MoveNode>? childNodes;
-
-	DirContainer dirCon;
-	int depth;
-
-	MoveNode(this.dirCon, {this.depth = 0});
-
-	/// Return child (or this) MoveNode at the given index in the tree
-	/// Counts recursively, taking into account expanded and unexpanded children
-	/// Returns null if no MoveNode exists for the index
-	MoveNode? getIndex(int index) {
-		return this.getIndexCounter(Counter(index));
-	}
-
-	MoveNode? getIndexCounter(Counter index) {
-		if (index.value == 0) {
-			return this;
-		}
-		if (!expanded) {
-			return null;
-		}
-
-		if (childNodes == null) {
-			return null;
-		}
-
-		for (var c in childNodes!) {
-			index.value -= 1;
-			var step = c.getIndexCounter(index);
-			if (step != null) {
-				return step;
-			}
-		}
-		return null;
-	}
-}
-
+/// Menu allowing the user to move files and folders
+/// It is activated as a popup from the main menu
 class MenuMove extends StatefulWidget {
 	final SelectionMenuData menuData;
 
@@ -71,6 +27,7 @@ class _StateMenuMove extends State<MenuMove> {
 		buildTree();
 	}
 
+	/// Build the folder tree, starting from the rootNode
 	Future<void> buildTree() async {
 		rootNode = MoveNode(await getMainDir());
 		List<MoveNode> children = await getChildren(rootNode!);
@@ -80,6 +37,8 @@ class _StateMenuMove extends State<MenuMove> {
 		});
 	}
 
+	/// Represents which folder is currently selected.
+	/// If the user chooses "Ok", files will be moved into the folder contained in this MoveNode
 	MoveNode? _selectedEntry;
 
 	@override
@@ -93,8 +52,8 @@ class _StateMenuMove extends State<MenuMove> {
 						"Move Items",
 						style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
 					),
+					// The actual list containing all of the move options
 					Expanded(
-						//width: double.maxFinite,
 						child: ListView.builder(
 							itemBuilder: (context, index) {
 								if (rootNode == null) {
@@ -180,4 +139,51 @@ class _StateMenuMove extends State<MenuMove> {
 
 		return children;
 	}
+}
+
+/// Class representing an element of the move menu
+class MoveNode {
+	bool expanded = false;
+	List<MoveNode>? childNodes;
+
+	DirContainer dirCon;
+	int depth;
+
+	MoveNode(this.dirCon, {this.depth = 0});
+
+	/// Return child (or this) MoveNode at the given index in the tree
+	/// Counts recursively, taking into account expanded and unexpanded children
+	/// Returns null if no MoveNode exists for the index
+	MoveNode? getIndex(int index) {
+		return this.getIndexCounter(RefInt(index));
+	}
+
+	MoveNode? getIndexCounter(RefInt index) {
+		if (index.value == 0) {
+			return this;
+		}
+		if (!expanded) {
+			return null;
+		}
+
+		if (childNodes == null) {
+			return null;
+		}
+
+		for (var c in childNodes!) {
+			index.value -= 1;
+			var step = c.getIndexCounter(index);
+			if (step != null) {
+				return step;
+			}
+		}
+		return null;
+	}
+}
+
+/// Simple class allowing an int to be passed by reference
+class RefInt {
+	int value;
+
+	RefInt(this.value);
 }

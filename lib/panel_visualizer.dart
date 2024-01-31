@@ -218,7 +218,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 				},
 				itemCount: widgetPage.length,
 			);
-		var topBar = mode == Mode.view ? 
+		var topBar = (mode == Mode.view) ? 
 			AppBar(
 				backgroundColor: COLOR_MENU_BG,
 				foregroundColor: COLOR_TEXT,
