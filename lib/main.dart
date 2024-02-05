@@ -77,18 +77,88 @@ class _MainPageState extends State<MainPage> {
 	Widget build(BuildContext context) {
 		// TODO add trash can and undo functions when deleting
 	
-		// Top toolbar widget
-		late AppBar topBar;
+		// Widgets
+		AppBar topBar = buildTopBar();
+		Drawer? drawer = buildDrawer();
+		BottomAppBar bottomBar = buildBottomBar();
+
+		return Scaffold(
+			appBar: topBar,
+			drawer: drawer,
+			body: Container(
+				height: double.infinity,	
+				width: double.infinity,
+				color: COLOR_BACKGROUND,
+				child: GridView.builder(
+					primary: false,
+					padding: const EdgeInsets.all(20),
+					itemCount: menuData.length,
+					gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+						crossAxisCount: 2,
+						childAspectRatio: 1.0,
+					),
+					itemBuilder: (context, index) {
+						MenuEntry childData = menuData.getMenuEntry(index);
+						
+						late Widget childWidget;
+						if (childData is EntryPanel) {
+							childWidget = MenuIconPanel(panelMenu: childData);
+						} else if (childData is EntryDirectory){
+							childWidget = MenuIconDir(entry: childData);
+						}
+						
+						return GestureDetector(
+							onTap: () {
+								if (menuData.mode == GlobalSelectionMode.view) {
+									if (childData is EntryPanel) {
+										Navigator.of(context).push(
+											MaterialPageRoute(
+												builder: (context) => PanelVisualizer(initialPage: childData.panel),
+											),
+										).then((value) {
+												setState(() {
+													menuData.sort();
+												});
+										});
+									} else if (childData is EntryDirectory) {
+										Navigator.of(context).push(
+											MaterialPageRoute(
+												builder: (context) => MainPage(directory: childData.dir),
+											),
+										).then((value) => readFiles()); // User may have moved files, necessitating a full rebuild
+									}
+								} else {
+									setState(() {
+										menuData.toggleSelection(index);
+									});
+								}
+							},
+							onLongPress: () {
+								setState(() {
+									menuData.select(index);
+								});
+							},
+							child: childWidget,
+						);
+					},
+				),
+			),
+			
+			bottomNavigationBar: bottomBar,
+		);
+	}
+
+	AppBar buildTopBar() {
 		if (menuData.mode == GlobalSelectionMode.view) {
 			if (isHomeDir) {
-				topBar = AppBar(
+				return AppBar(
 					foregroundColor: COLOR_TEXT,
 					backgroundColor: COLOR_MENU_BG,
 					title: const Text("Panels"),
 				);
 			} else {
 				_titleController.text = _activeDir!.displayName;
-				topBar = AppBar(
+				return AppBar(
 					foregroundColor: COLOR_TEXT,
 					backgroundColor: COLOR_MENU_BG,
 					title: TextField(
@@ -109,7 +179,7 @@ class _MainPageState extends State<MainPage> {
 				);
 			}
 		} else {
-			topBar = AppBar(
+			return AppBar(
 				foregroundColor: COLOR_TEXT,
 				backgroundColor: COLOR_MENU_BG,
 				leading: IconButton(
@@ -161,120 +231,67 @@ class _MainPageState extends State<MainPage> {
 			);
 		}
 
-		return Scaffold(
-			appBar: topBar,
+	}
 
-			drawer: (menuData.mode == GlobalSelectionMode.view && isHomeDir) ? Drawer(
-				child: Column(
-					crossAxisAlignment: CrossAxisAlignment.start,
-					
-					children: [
-						Container(
-							width: double.infinity,
-							child: const DrawerHeader(
-								decoration: BoxDecoration(
-									color: COLOR_MENU_BG,
+	Drawer? buildDrawer() {
+			if (menuData.mode == GlobalSelectionMode.view && isHomeDir) {
+				Drawer(
+					child: Column(
+						crossAxisAlignment: CrossAxisAlignment.start,
+
+						children: [
+							Container(
+								width: double.infinity,
+								child: const DrawerHeader(
+									decoration: BoxDecoration(
+										color: COLOR_MENU_BG,
+									),
+									child: const Text('Panels'),
 								),
-								child: const Text('Panels'),
 							),
-						),
-						ListTile(
-							title: Row(
-								children: [
-									Icon(Icons.delete),
-									SizedBox(
-										width: 10,
-									),
-									Text('Trash')
-								],
+							ListTile(
+								title: Row(
+									children: [
+										Icon(Icons.delete),
+										SizedBox(
+											width: 10,
+										),
+										Text('Trash')
+									],
+								),
+								onTap: () {},
 							),
-							onTap: () {},
-						),
-						ListTile(
-							title: Row(
-								children: [
-									Icon(Icons.restore),
-									SizedBox(
-										width: 10,
-									),
-									Text('Backups')
-								],
+							ListTile(
+								title: Row(
+									children: [
+										Icon(Icons.restore),
+										SizedBox(
+											width: 10,
+										),
+										Text('Backups')
+									],
+								),
+								onTap: () {},
 							),
-							onTap: () {},
-						),
 
-						Divider(),
-						Spacer(),
-						ListTile(
-							title: const Text('Support'),
-							onTap: () {},
-						),
-					],
-				),
-			) : null,
-
-			body: Container(
-				height: double.infinity,	
-				width: double.infinity,
-				color: COLOR_BACKGROUND,
-				child: GridView.builder(
-					primary: false,
-					padding: const EdgeInsets.all(20),
-					itemCount: menuData.length,
-					gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-						crossAxisCount: 2,
-						childAspectRatio: 1.0,
+							Divider(),
+							Spacer(),
+							ListTile(
+								title: const Text('Support'),
+								onTap: () {},
+							),
+						],
 					),
-					itemBuilder: (context, index) {
-						MenuEntry childData = menuData.getMenuEntry(index);
-						
-						late Widget childWidget;
-						if (childData is EntryPanel) {
-							childWidget = MenuIconPanel(panelMenu: childData);
-						} else if (childData is EntryDirectory){
-							childWidget = MenuIconDir(entry: childData);
-						}
-						
-						return GestureDetector(
-							onTap: () {
-								if (menuData.mode == GlobalSelectionMode.view) {
-									if (childData is EntryPanel) {
-										Navigator.of(context).push(
-											MaterialPageRoute(
-												builder: (context) => PanelVisualizer(initialPage: childData.panel),
-											),
-										).then((value) {
-												setState(() {
-													menuData.sort(SortMode.alphabetical);
-												});
-										});
-									} else if (childData is EntryDirectory) {
-										Navigator.of(context).push(
-											MaterialPageRoute(
-												builder: (context) => MainPage(directory: childData.dir),
-											),
-										).then((value) => readFiles()); // User may have moved files, necessitating a full rebuild
-									}
-								} else {
-									setState(() {
-										menuData.toggleSelection(index);
-									});
-								}
-							},
-							onLongPress: () {
-								setState(() {
-									menuData.select(index);
-								});
-							},
-							child: childWidget,
-						);
-					},
-				),
-			),
-			
-			bottomNavigationBar: BottomAppBar(
-				color: COLOR_MENU_BG,
-				child: Row(children: [
+				);
+			}
+			return null;
+	}
+
+	BottomAppBar buildBottomBar() {
+		return BottomAppBar(
+			color: COLOR_MENU_BG,
+			child: Row(
+				children: [
 					IconButton(
 						icon: const Icon(Icons.note_add),
 						tooltip: 'New Note',
@@ -290,12 +307,51 @@ class _MainPageState extends State<MainPage> {
 						},
 					),
 					Spacer(),
-					IconButton(
-						icon: const Icon(Icons.more_vert),
-						tooltip: 'More options',
-						onPressed: () {},
+					PopupMenuButton(
+						icon: Icon(Icons.more_vert),
+						tooltip: "Sort",
+						offset: Offset(0.0, -120.0),
+
+						itemBuilder: (context) => [
+							PopupMenuItem( 
+								value: 0,
+								onTap: () => {
+									setState(() {
+										menuData.sortReversed = !menuData.sortReversed;
+										menuData.sort();
+									})
+								},
+								child: Row(
+									children: [
+										Icon(menuData.sortReversed ? Icons.arrow_upward_outlined : Icons.arrow_downward_outlined),
+										SizedBox(
+											width: 10,
+										),
+										Text("Sort Direction")
+									],
+								),
+							),
+							PopupMenuItem( 
+								value: 0,
+								onTap: () => {
+									setState(() {
+										menuData.sortMode = SortMode.alphabetical;
+										menuData.sort();
+									})
+								},
+								child: Row(
+									children: [
+										Icon(Icons.abc),
+										SizedBox(
+											width: 10,
+										),
+										Text("Alphabetical")
+									],
+								),
+							),
+						],
 					),
-				]),
+				],
 			),
 		);
 	}
@@ -317,8 +373,7 @@ class _MainPageState extends State<MainPage> {
 
 	// Main IO functions
 
-	/// Read the files and folders in the active directory, and add them to the
-	/// menuData object
+	/// Read the files and folders in the active directory, and add them to the menuData object
 	Future<void> readFiles() async {
 		setState(() {
 			menuData = SelectionMenuData();
@@ -339,7 +394,7 @@ class _MainPageState extends State<MainPage> {
 			}
 
 			setState(() {
-			  menuData.sort(SortMode.alphabetical);
+			  menuData.sort();
 			});
 
 		} catch (e) {}
@@ -354,6 +409,7 @@ class _MainPageState extends State<MainPage> {
 		PanelData.newWithFile(file: file, factories: factories).then((pd) {
 			setState(() {
 				menuData.addPanel(pd);
+				menuData.sort();
 			});
 		});
 	}
@@ -366,6 +422,7 @@ class _MainPageState extends State<MainPage> {
 		var newDir =  await Directory(filename).create();
 		setState(() {
 			menuData.addDir(DirContainer(newDir));
+			menuData.sort();
 		});
 	}
 

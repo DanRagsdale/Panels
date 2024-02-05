@@ -61,6 +61,9 @@ class SelectionMenuData {
 	GlobalSelectionMode mode = GlobalSelectionMode.view;
 	Set<int> selections = {};
 
+	SortMode sortMode = SortMode.alphabetical;
+	bool sortReversed = false;
+
 	int get length => menuItems.length;
 	operator [](int i) => menuItems[i];
 
@@ -72,10 +75,10 @@ class SelectionMenuData {
 		menuItems.add(EntryDirectory(d, null));
 	}
 
-	void sort(SortMode sortMode, {bool reversed = false}) {
+	void sort() {
 		deselectAll();
 		
-		int multiplier = reversed ? -1 : 1;
+		int multiplier = sortReversed ? -1 : 1;
 		
 		menuItems.sort((a,b) {
 			return sortMode.compFunction(a, b) * multiplier;
