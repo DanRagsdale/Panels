@@ -44,6 +44,12 @@ Future<DirContainer> getMainDir() async {
 	return DirContainer(rawDir);
 }
 
+Future<DirContainer> getConfigDir() async {
+	final path = await _localPath;
+	Directory rawDir = await Directory('$path/config').create(recursive: true);
+	return DirContainer(rawDir);
+}
+
 /// Return the trashed files storage directory
 Future<DirContainer> getTrashDir() async {
 	// TODO Implement Trash

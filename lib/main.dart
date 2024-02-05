@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -69,6 +70,7 @@ class _MainPageState extends State<MainPage> {
 		_activeDir = widget.directory;
 		isHomeDir = _activeDir == null;
 		readFiles();
+		readConfig();
 	}
 
 	TextEditingController _titleController = TextEditingController();
@@ -350,6 +352,9 @@ class _MainPageState extends State<MainPage> {
 								),
 							),
 						],
+						onSelected: (_value) {
+							saveConfig();
+						},
 					),
 				],
 			),
@@ -371,7 +376,47 @@ class _MainPageState extends State<MainPage> {
 		return _activeDir!;
 	}
 
-	// Main IO functions
+	// File IO functions
+	
+	Future<void> readConfig() async {
+		try {
+			final dirCon = await getConfigDir();
+			File f = File(dirCon.path + "/config.json");
+			if (await f.exists()) {
+				print("Config Found!!");
+				final rawContents = await f.readAsString();
+				final contents = jsonDecode(rawContents);
+
+				print(contents);
+
+				menuData.sortReversed = contents["sort_reversed"];
+				menuData.sortMode = SortMode.values[contents["sort_mode"]];
+
+				setState(() {
+					menuData.sort();
+				});
+			} else {
+				print("Config not found!!!");
+			}
+		} catch (e) {}
+	}
+
+	Future<void> saveConfig() async {
+		print("Saving Config!");
+		final dirCon = await getConfigDir();
+		File file = File(dirCon.path + "/config.json");
+		//var widgetMaps = [];
+		//for (var w in widgetEntries) {
+		//	widgetMaps.add(w.uw.toJsonMap());
+		//}
+		//// Write the file
+		var output = jsonEncode({
+			"sort_reversed" : menuData.sortReversed,
+			"sort_mode" : menuData.sortMode.index,
+		});
+
+		file.writeAsString(output);
+	}
 
 	/// Read the files and folders in the active directory, and add them to the menuData object
 	Future<void> readFiles() async {
