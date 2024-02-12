@@ -44,15 +44,20 @@ class _MyAppState extends State<MyApp> {
 	Widget build(BuildContext context) {
 		return MaterialApp(
 			//debugShowCheckedModeBanner: false,
-			home: MainPage(),
+			home: MainPage(dirType: DirType.home,),
 		);
 	}
 }
 
+enum DirType {
+	home, trash, general,
+}
+
 class MainPage extends StatefulWidget {
 	final DirContainer? directory;
+	final DirType dirType;
 
-	MainPage({this.directory});
+	MainPage({required this.dirType, this.directory,});
 
 	@override
 	State<MainPage> createState() => _MainPageState();
@@ -61,14 +66,14 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
 	late SelectionMenuData menuData;
 	
+	late DirType dirType;
 	DirContainer? _activeDir;	
-	bool isHomeDir = true;
 
 	@override
 	void initState() {
 		super.initState();
+		dirType = widget.dirType;
 		_activeDir = widget.directory;
-		isHomeDir = _activeDir == null;
 		readFiles();
 		readConfig();
 	}
@@ -77,12 +82,12 @@ class _MainPageState extends State<MainPage> {
 
 	@override
 	Widget build(BuildContext context) {
-		// TODO add trash can and undo functions when deleting
+		// TODO undo functions when deleting
 	
 		// Widgets
 		AppBar topBar = buildTopBar();
 		Drawer? drawer = buildDrawer();
-		BottomAppBar bottomBar = buildBottomBar();
+		BottomAppBar? bottomBar = buildBottomBar();
 
 		return Scaffold(
 			appBar: topBar,
@@ -125,9 +130,12 @@ class _MainPageState extends State<MainPage> {
 									} else if (childData is EntryDirectory) {
 										Navigator.of(context).push(
 											MaterialPageRoute(
-												builder: (context) => MainPage(directory: childData.dir),
+												builder: (context) => MainPage(dirType: DirType.general, directory: childData.dir),
 											),
-										).then((value) => readFiles()); // User may have moved files, necessitating a full rebuild
+										).then((value) {
+											readFiles();
+											readConfig();
+										}); // User may have moved files or changed config, necessitating a full rebuild
 									}
 								} else {
 									setState(() {
@@ -152,33 +160,40 @@ class _MainPageState extends State<MainPage> {
 
 	AppBar buildTopBar() {
 		if (menuData.mode == GlobalSelectionMode.view) {
-			if (isHomeDir) {
-				return AppBar(
-					foregroundColor: COLOR_TEXT,
-					backgroundColor: COLOR_MENU_BG,
-					title: const Text("Panels"),
-				);
-			} else {
-				_titleController.text = _activeDir!.displayName;
-				return AppBar(
-					foregroundColor: COLOR_TEXT,
-					backgroundColor: COLOR_MENU_BG,
-					title: TextField(
-						decoration: null,
-						controller: _titleController,
-						style: TextStyle(fontWeight: FontWeight.bold),
-						onTap: () {
-							if (_titleController.text == DEFAULT_FOLDER_TITLE) {
-								_titleController.text = '';
-							}
-						},
-						onChanged: (value) {
-							try {
-								_activeDir?.inPlaceRename(value);
-							} catch(e) {}
-						},
-					),
-				);
+			switch(dirType) {
+				case DirType.home:
+					return AppBar(
+						foregroundColor: COLOR_TEXT,
+						backgroundColor: COLOR_MENU_BG,
+						title: const Text("Panels"),
+					);
+				case DirType.trash:
+					return AppBar(
+						foregroundColor: COLOR_TEXT,
+						backgroundColor: COLOR_MENU_BG,
+						title: const Text("Trash"),
+					);
+				case DirType.general:
+					_titleController.text = _activeDir!.displayName;
+					return AppBar(
+						foregroundColor: COLOR_TEXT,
+						backgroundColor: COLOR_MENU_BG,
+						title: TextField(
+							decoration: null,
+							controller: _titleController,
+							style: TextStyle(fontWeight: FontWeight.bold),
+							onTap: () {
+								if (_titleController.text == DEFAULT_FOLDER_TITLE) {
+									_titleController.text = '';
+								}
+							},
+							onChanged: (value) {
+								try {
+									_activeDir?.inPlaceRename(value);
+								} catch(e) {}
+							},
+						),
+					);
 			}
 		} else {
 			return AppBar(
@@ -194,6 +209,7 @@ class _MainPageState extends State<MainPage> {
 				),
 				title: Text("${menuData.selectedCount} Selected"),
 				actions: [
+					// Move Files
 					IconButton(
 						icon: Icon(Icons.move_up_outlined),
 						onPressed: () {
@@ -221,10 +237,11 @@ class _MainPageState extends State<MainPage> {
 							});
 						},
 					),
+					// Delete Files
 					IconButton(
 						icon: Icon(Icons.delete),
 						onPressed: () {
-							deleteSelected().then((value) {
+							deleteSelected().then((_) {
 								setState(() {});
 							});
 						},
@@ -236,8 +253,8 @@ class _MainPageState extends State<MainPage> {
 	}
 
 	Drawer? buildDrawer() {
-			if (menuData.mode == GlobalSelectionMode.view && isHomeDir) {
-				Drawer(
+			if (menuData.mode == GlobalSelectionMode.view && dirType == DirType.home) {
+				return Drawer(
 					child: Column(
 						crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -261,26 +278,38 @@ class _MainPageState extends State<MainPage> {
 										Text('Trash')
 									],
 								),
-								onTap: () {},
+								onTap: () {
+									getTrashDir().then((dir) {
+										Navigator.of(context).push(
+											MaterialPageRoute(
+												builder: (context) => MainPage(dirType: DirType.trash, directory: dir),
+											),
+										).then((value) {
+											readFiles();
+											readConfig();
+										}); // User may have moved files or changed config, necessitating a full rebuild
+									});
+								},
 							),
-							ListTile(
-								title: Row(
-									children: [
-										Icon(Icons.restore),
-										SizedBox(
-											width: 10,
-										),
-										Text('Backups')
-									],
-								),
-								onTap: () {},
-							),
+							//ListTile(
+							//	title: Row(
+							//		children: [
+							//			Icon(Icons.restore),
+							//			SizedBox(
+							//				width: 10,
+							//			),
+							//			Text('Backups')
+							//		],
+							//	),
+							//	onTap: () {},
+							//),
 
 							Divider(),
 							Spacer(),
 							ListTile(
-								title: const Text('Support'),
-								onTap: () {},
+								title: const Text('Donate'),
+								subtitle: const Text(''),
+								onTap: null,
 							),
 						],
 					),
@@ -289,7 +318,11 @@ class _MainPageState extends State<MainPage> {
 			return null;
 	}
 
-	BottomAppBar buildBottomBar() {
+	BottomAppBar? buildBottomBar() {
+		if(dirType == DirType.trash) {
+			return null;
+		}
+
 		return BottomAppBar(
 			color: COLOR_MENU_BG,
 			child: Row(
@@ -471,8 +504,21 @@ class _MainPageState extends State<MainPage> {
 		});
 	}
 
-	/// Delete all of the currently selected notes
+	/// Move the selected files to the trash
+	/// If the user is selecting files from the trash, the file is permanenetly deleted
 	Future<void> deleteSelected() async {
+		if (dirType != DirType.trash) {
+			var trashDir = await getTrashDir();
+			List<MenuEntry> selections = menuData.removeSelected();
+			setState(() {});
+			for (var s in selections) {
+				try {
+					await s.moveTo(trashDir.path);
+				} catch(e) {
+				}
+			}
+			return;
+		}
 		var removed = menuData.removeSelected();
 		for (var entry in removed) {
 			try {

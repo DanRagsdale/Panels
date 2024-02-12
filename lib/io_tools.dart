@@ -52,12 +52,7 @@ Future<DirContainer> getConfigDir() async {
 
 /// Return the trashed files storage directory
 Future<DirContainer> getTrashDir() async {
-	// TODO Implement Trash
-	throw UnimplementedError();
-}
-
-/// Return the backup files storage directory
-Future<DirContainer> getBackupDir() async {
-	// TODO Implement Backup
-	throw UnimplementedError();
+		final path = await _localPath;
+		Directory rawDir = await Directory('$path/trash').create(recursive: true);
+		return DirContainer(rawDir);
 }
