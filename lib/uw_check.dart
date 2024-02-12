@@ -87,10 +87,14 @@ class _UWCheckState extends State<UWCheck> {
 				border: InputBorder.none,
 				hintText: 'Enter a to-do',
 			),
+			textInputAction: TextInputAction.newline,
 			controller: _textController,
 			onChanged: (value) {
 			  widget.factory.text = value;
 				widget.controller.requestSave();
+			},
+			onSubmitted: (value) {
+				widget.controller.insertAfter(widget.key!, UWCheckFactory(GlobalKey()));
 			},
 		);
 		
