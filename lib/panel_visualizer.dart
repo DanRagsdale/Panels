@@ -86,7 +86,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 
 		widgetPage = widget.initialPage;
 		
-		//TODO prevent wasting time reloading if the page is already cached
+		// TODO prevent wasting time reloading if the page is already cached.
 		widgetPage.readFile().then((_) {
 			setState(() {
 				_titleController.text = widget.initialPage.title;
@@ -110,116 +110,22 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 	Widget build(BuildContext context) {
 		_titleController.text = widget.initialPage.title;
 
-		var bottomBar = Row(
-				mainAxisAlignment: MainAxisAlignment.spaceBetween,
-				children: [
-					Expanded(
-						child: Row(
-							mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-							children: [
-								WidgetButtons.text.getIconButton(add),
-								WidgetButtons.check.getIconButton(add),
-								WidgetButtons.image.getIconButton(add),
-								WidgetButtons.separator.getIconButton(add),
-							],
-						),
-					),
-					PopupMenuButton(
-						icon: Icon(Icons.more_vert),
-						tooltip: "More Widgets",
-						offset: Offset(0.0, -120.0),
+		var topBar = buildTopBar();
+		var body = buildBody();
+		var bottomBar = buildBottomBar();
 
-						itemBuilder: (context) => [
-							WidgetButtons.checkController.getMenuItem(add),
-							WidgetButtons.form.getMenuItem(add),
-						],
-						//onSelected: (index) {
-						//	add(WidgetButtons.getFactoryByIndex(index));
-						//},
-					),
-				],
-			);
 
-		var content = mode == Mode.view ?
-			// View Mode display
-			ListView.builder(
-				itemBuilder: (context, index) {
-					UserWidget? uw = widgetPage.buildWidget(this, Mode.view, index);
-					if (uw == null) {
-						return null;
-					}
-					return InkWell(
-						onLongPress: () {
-							setState(() {
-								mode = Mode.edit;
-								widgetPage.setSelection(index, true);
-							});
-						},
-						child: Stack(
-							children: [
-								uw,
-								Positioned(
-									right: 40,
-									top: 0,
-									bottom: 0,
-									width: 100.0,
-									child: AbsorbPointer(),
-								),
-							],
-						)
-					);
-				},
-			) : 
-			// Edit Mode display
-			ReorderableListView.builder(
-				//buildDefaultDragHandles: false,
-				onReorderStart: (index) {
-					// Needed to prevent freezing when the items are moved
-					FocusManager.instance.primaryFocus?.unfocus();
-				},
-				onReorder: (int oldIndex, int newIndex) {
-					setState(() { 
-						if (oldIndex < newIndex) {
-							// removing the item at oldIndex will shorten the list by 1.
-							newIndex -= 1;
-						}
-						var movedItem = widgetPage.removeAt(oldIndex);
-						widgetPage.insert(newIndex, movedItem);
-					});  
-				},
-				itemBuilder: (context, index) {
-					UserWidget uw = widgetPage.buildWidget(this, Mode.edit, index)!;
-					return InkWell(
-						key: Key(uw.key.toString() + "InkWell"),
-						onTap: () {
-							setState(() {
-								widgetPage.toggleSelection(index);
-							});
-						},
-						child: Stack(
-							alignment: Alignment.centerRight,
-							children: [
-								uw,
-								// the Ignore Pointer is offset from the right to allow widgets
-								// which have an add widget button to function properly.
-								// This is a bad solution.
-								// TODO create a more robust solution allowing user to select widgets without interfering with the add widget button
-								Positioned(
-									right: 50,
-									top: 0,
-									bottom: 0,
-									width: 100.0,
-									child: AbsorbPointer(),
-								),
-								//null,
-							],
-						)
-					);
-				},
-				itemCount: widgetPage.length,
-			);
-		var topBar = (mode == Mode.view) ? 
-			AppBar(
+		return Scaffold(
+			appBar: topBar,
+			body: body,
+			bottomNavigationBar: bottomBar,
+		);
+	}
+
+	AppBar buildTopBar() {
+		// View Mode
+		if (mode == Mode.view) { 
+			return AppBar(
 				backgroundColor: COLOR_MENU_BG,
 				foregroundColor: COLOR_TEXT,
 				title: TextField(
@@ -233,39 +139,151 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 						}
 					},
 				),
-			) : 
-			AppBar(
-				backgroundColor: COLOR_MENU_BG,
-				foregroundColor: COLOR_TEXT,
-				leading: IconButton(
-					icon: Icon(Icons.close_outlined),
+			);
+		}
+		// Edit Mode
+		int selectionCount = widgetPage.countSelected();
+		return AppBar(
+			backgroundColor: COLOR_MENU_BG,
+			foregroundColor: COLOR_TEXT,
+			leading: IconButton(
+				icon: Icon(Icons.close_outlined),
+				onPressed: () {
+					setState(() {
+						mode = Mode.view;
+						widgetPage.clearSelections();
+					});
+				},
+			),
+			title: Text("$selectionCount selected"),
+			actions: [
+				IconButton(
+					icon: Icon(Icons.delete),
 					onPressed: () {
 						setState(() {
+						  widgetPage.deleteSelected();
 							mode = Mode.view;
-							widgetPage.clearSelections();
 						});
 					},
 				),
-				actions: [
-					IconButton(
-						icon: Icon(Icons.delete),
-						onPressed: () {
-							setState(() {
-							  widgetPage.deleteSelected();
-								mode = Mode.view;
-							});
-						},
-					),
-				],	
-			);
-
-		return Scaffold(
-			appBar: topBar,
-			body: content,
-			bottomNavigationBar: bottomBar,
+			],	
 		);
 	}
-	
+
+	Widget buildBody() {
+		// View Mode display
+		if (mode == Mode.view) {
+			return ListView.builder(
+				itemBuilder: (context, index) {
+					UserWidget? uw = widgetPage.buildWidget(this, Mode.view, index);
+					if (uw == null) {
+						return null;
+					}
+					// TODO figure out a more performant solution
+					return IntrinsicHeight(
+						child: Stack(
+							children: [
+								uw,
+								InkWell(
+									onLongPress: () {
+										setState(() {
+											mode = Mode.edit;
+											widgetPage.setSelection(index, true);
+										});
+									},
+								),
+							],
+						),
+					);
+				},
+			);
+		}
+		// Edit Mode display
+		return ReorderableListView.builder(
+			//buildDefaultDragHandles: false,
+			onReorderStart: (index) {
+				// Needed to prevent freezing when the items are moved
+				FocusManager.instance.primaryFocus?.unfocus();
+			},
+			onReorder: (int oldIndex, int newIndex) {
+				setState(() { 
+					if (oldIndex < newIndex) {
+						// removing the item at oldIndex will shorten the list by 1.
+						newIndex -= 1;
+					}
+					var movedItem = widgetPage.removeAt(oldIndex);
+					widgetPage.insert(newIndex, movedItem);
+				});  
+			},
+			itemBuilder: (context, index) {
+				UserWidget uw = widgetPage.buildWidget(this, Mode.edit, index)!;
+				return IntrinsicHeight(
+					key: Key(uw.key.toString() + "Clicker"),
+					child: Stack(
+						children: [
+							uw,
+							Positioned(
+								right: 50,
+								top: 0,
+								bottom: 0,
+								width: 100.0,
+								child: GestureDetector(
+									behavior: HitTestBehavior.opaque,
+									onTap: () {
+										setState(() {
+											widgetPage.toggleSelection(index);
+										});
+									},
+								),
+							),
+							GestureDetector(
+								behavior: HitTestBehavior.translucent,
+								onLongPress: () {
+									setState(() {
+										widgetPage.toggleSelection(index);
+									});
+								},
+							),
+						],
+					),
+				);
+			},
+			itemCount: widgetPage.length,
+		);
+	}
+
+	Widget buildBottomBar() {
+		return Row(
+			mainAxisAlignment: MainAxisAlignment.spaceBetween,
+			children: [
+				Expanded(
+					child: Row(
+						mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+						children: [
+							WidgetButtons.text.getIconButton(add),
+							WidgetButtons.check.getIconButton(add),
+							WidgetButtons.image.getIconButton(add),
+							WidgetButtons.separator.getIconButton(add),
+						],
+					),
+				),
+				PopupMenuButton(
+					icon: Icon(Icons.more_vert),
+					tooltip: "More Widgets",
+					offset: Offset(0.0, -120.0),
+
+					itemBuilder: (context) => [
+						WidgetButtons.checkController.getMenuItem(add),
+						WidgetButtons.form.getMenuItem(add),
+					],
+					//onSelected: (index) {
+					//	add(WidgetButtons.getFactoryByIndex(index));
+					//},
+				),
+			],
+		);
+	}
+
 	@override
 	void dispose() {
 		widget.initialPage.saveFile();
@@ -326,5 +344,4 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 			saveFlag = true;
 		}
 	}
-
 }

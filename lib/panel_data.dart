@@ -116,6 +116,16 @@ class PanelData {
 		widgetEntries.removeWhere((e) => e.selected);
 	}
 
+	int countSelected() {
+		int counter = 0;
+		for (var w in widgetEntries) {
+			if (w.selected) {
+				counter += 1;
+			}
+		}
+		return counter;
+	}
+
 	/// Get the string preview of this widget for use in the main menu
 	String getPreview() {
 		String output = "";
