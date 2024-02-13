@@ -307,8 +307,8 @@ class _MainPageState extends State<MainPage> {
 							Divider(),
 							Spacer(),
 							ListTile(
-								title: const Text('Donate'),
-								subtitle: const Text(''),
+								title: const Text('Support Panels'),
+								subtitle: const Text('Venmo: DanRagsdale'),
 								onTap: null,
 							),
 						],
