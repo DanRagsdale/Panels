@@ -184,7 +184,8 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 						child: Stack(
 							children: [
 								uw,
-								InkWell(
+								GestureDetector(
+									behavior: HitTestBehavior.translucent,
 									onLongPress: () {
 										setState(() {
 											mode = Mode.edit;
