@@ -186,7 +186,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 								uw,
 								GestureDetector(
 									behavior: HitTestBehavior.translucent,
-									onLongPress: () {
+									onDoubleTap: () {
 										setState(() {
 											mode = Mode.edit;
 											widgetPage.setSelection(index, true);
@@ -239,7 +239,7 @@ class PanelVisualizerState extends State<PanelVisualizer> {
 							),
 							GestureDetector(
 								behavior: HitTestBehavior.translucent,
-								onLongPress: () {
+								onDoubleTap: () {
 									setState(() {
 										widgetPage.toggleSelection(index);
 									});
